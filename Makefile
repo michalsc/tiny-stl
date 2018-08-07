@@ -6,6 +6,8 @@ HOST_CXX := /usr/bin/clang++
 HOST_CXXFLAGS := -Os -std=c++0x
 HOST_LDFLAGS :=
 
+VERSTRING := $(shell ./get_git_version.sh)
+
 OBJS := main.o string.o
 
 OBJDIR := Build
@@ -41,12 +43,12 @@ $(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS))
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo "Compiling: $*.cpp"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+	@$(CXX) -c $(CXXFLAGS) $(VERSTRING) $< -o $@
 
 $(OBJDIR)/%.d: %.cpp
 	@mkdir -p $(@D)
 	@set -e; rm -f $@; \
-         $(CXX) -MM -MT $(basename $@).o $(CXXFLAGS) $< > $@.$$$$; \
+         $(CXX) -MM -MT $(basename $@).o $(CXXFLAGS) $(VERSTRING) $< > $@.$$$$; \
          sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
          rm -f $@.$$$$
 
