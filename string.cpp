@@ -11,18 +11,43 @@ namespace t_std {
 
 void * AllocMem(int size, int type)
 {
-    void *ptr = malloc(size);
+    int *ptr = reinterpret_cast<int *>(malloc(size + 32));
+    ptr[0] = size;
+    ptr[1] = 0xdeadbeef;
+    ptr[2] = 0xdeadbeef;
+    ptr[3] = 0xdeadbeef;
+
+    ptr[4 + size/4] = 0xcafebabe;
+    ptr[5 + size/4] = 0xcafebabe;
+    ptr[6 + size/4] = 0xcafebabe;
+    ptr[7 + size/4] = 0xcafebabe;
+
     if (type & MEMF_CLEAR)
     {
-        bzero(ptr, size);
+        bzero(&ptr[4], size);
     }
-    return ptr;
+
+    return &ptr[4];
 }
 
 void FreeMem(void *ptr, int size)
 {
-    (void)size;
-    free(ptr);
+    unsigned int *p = reinterpret_cast<unsigned int *>(ptr);
+
+    p -= 4;
+    if (*p != (unsigned int)size)
+        printf("Size mismatch at FreeMem!! %d != %d\n", *p, size);
+
+    if (p[1] != 0xdeadbeef || p[2] != 0xdeadbeef || p[3] != 0xdeadbeef)
+    {
+        printf("FreeMem(): left wall damaged %08x%08x%08x\n", p[1], p[2], p[3]);
+    }
+    if (p[4 + size/4] != 0xcafebabe || p[5+size/4] != 0xcafebabe || p[6+size/4] != 0xcafebabe || p[7+size/4] != 0xcafebabe)
+    {
+        printf("FreeMem(): right wall damaged %08x%08x%08x%08x\n", p[4 + size/4], p[5+size/4], p[6+size/4],p[7+size/4]);
+    }
+    
+    free(p);
 }
 
 void CopyMem(const void *src, void *dst, int size)
@@ -73,7 +98,8 @@ string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
 string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
 {
     resize_buffer(n + 1);
-    memset(_buffer, c, n);
+    for (int i=0; i < n; i++)
+        _buffer[i] = c;
     _buffer[n] = 0;
     _length = n;
 }
@@ -91,7 +117,7 @@ string::string(string&& str)
 
 string& string::operator= (const string& str)
 {
-    resize_buffer(str._capacity);
+    resize_buffer(str._length + 1);
     CopyMem(str._buffer, _buffer, str._length + 1);
     _length = str._length;
 
@@ -151,10 +177,11 @@ void string::resize_buffer(int size)
             size = (size + 15) & ~15;
 
             // if size is larger than string length, allow to realloc
-            if (size > (_length + 1))
+            if (size > (_capacity))
             {
                 void * new_buff = AllocMem(size, MEMF_CLEAR);
                 CopyMem(_buffer, new_buff, _capacity);
+                FreeMem(_buffer, _capacity);
                 _buffer = static_cast<char *>(new_buff);
                 _capacity = size;
             }
@@ -221,7 +248,7 @@ string& string::operator+= (const string& str)
     int len = str._length + 1;
 
     if (_capacity - _length < len)
-        resize_buffer(_capacity + len);
+        resize_buffer(_length + len);
     
     CopyMem(str._buffer, _buffer + _length, len);
     _length += len - 1;
@@ -234,7 +261,7 @@ string& string::operator+= (const char *str)
     int len = strlen(str) + 1;
 
     if (_capacity - _length < len)
-        resize_buffer(_capacity + len);
+        resize_buffer(_length + len);
     
     CopyMem(str, _buffer + _length, len);
     _length += len - 1;
@@ -245,7 +272,7 @@ string& string::operator+= (const char *str)
 string& string::operator+= (char c)
 {
     if (_capacity - _length < 2)
-        resize_buffer(_capacity + 2);
+        resize_buffer(_length + 2);
     
     _buffer[_length++] = c;
     _buffer[_length] = 0;
@@ -302,6 +329,73 @@ string& string::append(int n, char c)
         _buffer[_length + n] = 0;
         _length += n;
     }
+
+    return *this;
+}
+
+string& string::assign(const string& str)
+{
+    resize_buffer(str._length + 1);
+    CopyMem(str._buffer, _buffer, str._length + 1);
+    _length = str._length;
+
+    return *this;
+}
+
+string& string::assign(const string& str, int subpos, int sublen)
+{
+    if (subpos < str._length)   // else out of range exception!
+    {
+        if (sublen + subpos > str._length)
+            sublen = str._length - subpos;
+
+        resize_buffer(sublen + 1);
+        CopyMem(str._buffer + subpos, _buffer, sublen);
+        _buffer[sublen] = 0;
+        _length = sublen;
+    }
+    return *this;
+}
+
+string& string::assign(const char *s, int n)
+{
+    if (s)
+    {
+        int len = strlen(s);
+        
+        if (len > n)
+            len = n;
+
+        resize_buffer(len + 1);
+        CopyMem(s, _buffer, len);
+        _buffer[len] = 0;
+        _length = len;
+    }
+
+    return *this;
+}
+
+string& string::assign(int n, char c)
+{
+    resize_buffer(n + 1);
+    memset(_buffer, c, n);
+    _buffer[n] = 0;
+    _length = n;
+
+    return *this;
+}
+
+string& string::assign(string&& str)
+{
+    resize_buffer(0);
+
+    _buffer = str._buffer;
+    _capacity = str._capacity;
+    _length = str._length;
+
+    str._buffer = NULL;
+    str._capacity = 0;
+    str._length = 0;
 
     return *this;
 }

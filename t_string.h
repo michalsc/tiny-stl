@@ -50,12 +50,12 @@ public:
     string& append(const char* s, int n);
     string& append(int n, char c);
     void push_back(char c) { *this += c; }
-    string& assign(const string& str) { return (*this = str); }
-    string& assign(const string& str, int subpos, int sublen); // TODO
+    string& assign(const string& str);
+    string& assign(const string& str, int subpos, int sublen);
     string& assign(const char *s) { return (*this = s); }
-    string& assign(const char *s, int n); // TODO
-    string& assign(int n, char c); // TODO
-    string& assign(string&& str); // TODO
+    string& assign(const char *s, int n);
+    string& assign(int n, char c);
+    string& assign(string&& str);
     //insert
     //erase
     //replace
