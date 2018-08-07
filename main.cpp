@@ -4,10 +4,14 @@
 
 using namespace t_std;
 
+static const char __attribute__((used)) version[] = "\0$VER: MiniStd " VERSION_STRING;
+
 int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
+
+    
 
     string str = "Hello";
   string s0 ("Initial string");
