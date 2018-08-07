@@ -50,6 +50,7 @@ string::string(const string& str) : _buffer(NULL), _capacity(0), _length(0)
     printf("string::string(const string& str='%s'\n", str._buffer);
     resize_buffer(str._length + 1);
     CopyMem(str._buffer, _buffer, str._length + 1);
+    _length = str._length;
 }
 
 string::string(const string& str, int pos, int len) : _buffer(NULL), _capacity(0), _length(0)
@@ -60,6 +61,7 @@ string::string(const string& str, int pos, int len) : _buffer(NULL), _capacity(0
     resize_buffer(len + 1);
     CopyMem(str._buffer + pos, _buffer, len);
     _buffer[len] = 0;
+    _length = len;
 }
 
 string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
@@ -67,6 +69,7 @@ string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
     resize_buffer(n + 1);
     CopyMem(src, _buffer, n);
     _buffer[n] = 0;
+    _length = n;
 }
 
 string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
@@ -74,6 +77,7 @@ string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
     resize_buffer(n + 1);
     memset(_buffer, c, n);
     _buffer[n] = 0;
+    _length = n;
 }
 
 string::string(string&& str)
