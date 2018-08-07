@@ -42,7 +42,12 @@ public:
     string& operator+= (const string& str);
     string& operator+= (const char* s);
     string& operator+= (char c);
-    //append
+    string& append(const string& str) { return (*this += str); }
+    string& append(const string& str, int subpos, int sublen);
+    string& append(const char* s) { return (*this += s); }
+    string& append(const char* s, int n);
+    string& append(int n, char c);
+
     //push_back
     //assign
     //insert
@@ -51,14 +56,14 @@ public:
     void swap(string& str);
 
     // String operations
-    const char * c_str() const { return _buffer; }
-    const char * data() const { return _buffer; }
+    const char * c_str() const { if (_length) return _buffer; else return &_null; }
+    const char * data() const { if (_length) return _buffer; else return &_null; }
     
     // Member constants
     static const int npos = -1;
 
 private:
-    static const char _null = 0;
+    static const char _null;
     char *_buffer;
     int _capacity;
     int _length;

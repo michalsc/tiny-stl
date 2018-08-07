@@ -29,6 +29,8 @@ void CopyMem(const void *src, void *dst, int size)
     memcpy(dst, src, size);
 }
 
+const char string::_null = 0;
+
 string::string(const char *src) : _buffer(NULL), _capacity(0), _length(0)
 {
     printf("string::string(const char *src='%s')\n", src);
@@ -245,6 +247,24 @@ string& string::operator+= (char c)
     _buffer[_length++] = c;
     _buffer[_length] = 0;
 
+    return *this;
+}
+
+string& string::append(const string &str, int subpos, int sublen)
+{
+    if (subpos < str._length)
+    {
+        int len = sublen;
+
+        if (len > str._length - subpos)
+            len = str._length - subpos;
+
+        if (_capacity <= (_length + len))
+            resize_buffer(_length + len + 1);
+
+        CopyMem(str._buffer + subpos, _buffer + _length, len + 1);
+        _length = _length + len;
+    }
     return *this;
 }
 
