@@ -12,7 +12,7 @@ OBJS := main.o string.o
 
 OBJDIR := Build
 
-TESTOBJS := 
+TESTOBJS := string_test.o string.o run_tests.o
 
 TESTOBJDIR := BuildTest
 

@@ -1,6 +1,8 @@
 #ifndef _T_STRING_H
 #define _T_STRING_H
 
+#include <ostream>
+
 namespace t_std {
 
 class string {
@@ -96,6 +98,8 @@ bool operator>= (const char*   lhs, const string& rhs);
 bool operator>= (const string& lhs, const char*   rhs);
 
 void swap(string& s1, string& s2);
+
+std::ostream &operator<<(std::ostream &os, string const &str);
 
 }
 

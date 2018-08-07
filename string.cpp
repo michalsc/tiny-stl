@@ -2,8 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ostream>
 
-using namespace t_std;
+namespace t_std {
 
 #define MEMF_ANY    1
 #define MEMF_CLEAR  2
@@ -33,8 +34,6 @@ const char string::_null = 0;
 
 string::string(const char *src) : _buffer(NULL), _capacity(0), _length(0)
 {
-    printf("string::string(const char *src='%s')\n", src);
-
     if (src)
     {
         int len = strlen(src);
@@ -47,7 +46,6 @@ string::string(const char *src) : _buffer(NULL), _capacity(0), _length(0)
 
 string::string(const string& str) : _buffer(NULL), _capacity(0), _length(0)
 {
-    printf("string::string(const string& str='%s'\n", str._buffer);
     resize_buffer(str._length + 1);
     CopyMem(str._buffer, _buffer, str._length + 1);
     _length = str._length;
@@ -362,7 +360,6 @@ bool operator>= (const string& lhs, const char *  rhs)
     return (strcmp(lhs.c_str(), rhs) >= 0);
 }
 
-
 void string::swap(string& str)
 {
     char *_buff = _buffer;
@@ -377,3 +374,13 @@ void string::swap(string& str)
     str._capacity = _cap;
     str._length = _len;
 }
+
+std::ostream &operator<<(std::ostream &os, string const &str)
+{
+    os << "\"" << str.c_str() << "\"";
+
+    return os;
+}
+
+}
+

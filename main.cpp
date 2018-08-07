@@ -1,8 +1,7 @@
 #include <stdio.h>
+#include <iostream>
 
 #include "t_string.h"
-
-using namespace t_std;
 
 static const char __attribute__((used)) version[] = "\0$VER: MiniStd " VERSION_STRING;
 
@@ -13,18 +12,18 @@ int main(int argc, char **argv)
 
     
 
-    string str = "Hello";
-  string s0 ("Initial string");
+    t_std::string str = "Hello";
+    t_std::string s0("Initial string");
 
-  // constructors used in the same order as described above:
-  string s1;
-  string s2 (s0);
-  string s3 (s0, 8, 3);
-  string s4 ("A character sequence");
-  string s5 ("Another character sequence", 12);
-  string s6a (10, 'x');
-  string s6b (10, 42); 
-  
+    // constructors used in the same order as described above:
+    t_std::string s1;
+    t_std::string s2(s0);
+    t_std::string s3(s0, 8, 3);
+    t_std::string s4("A character sequence");
+    t_std::string s5("Another character sequence", 12);
+    t_std::string s6a(10, 'x');
+    t_std::string s6b(10, 42);
+
     printf("MiniStd\n");
     printf("str.length = %d\n", str.length());
     printf("str.capacity = %d\n", str.capacity());
@@ -37,6 +36,8 @@ int main(int argc, char **argv)
     printf("s5: '%s'\n", s5.c_str());
     printf("s6a: '%s'\n", s6a.c_str());
     printf("s6b: '%s'\n", s6b.c_str());
+
+    std::cout << s6b << std::endl;
 
     return 0;
 }
