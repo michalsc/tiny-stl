@@ -185,6 +185,23 @@ string::~string()
     resize_buffer(0);
 }
 
+void string::resize(int n, char c)
+{
+    if (n < _length)
+    {
+        _buffer[n] = 0;
+        _length = n;
+    }
+    else
+    {
+        if (n >= _capacity)
+            resize_buffer(n + 1);
+        
+        memset(_buffer + _length, c, n - _length);
+        _length = n;
+    }
+}
+
 void string::clear()
 {
     if (_buffer && _length > 0)

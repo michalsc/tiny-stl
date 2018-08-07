@@ -28,7 +28,7 @@ public:
     int size() { return _length; }
     int length() { return _length; }
     int max_size() { return 0x7fffffff; }
-    //resize
+    void resize(int n, char c=0);
     int capacity() { return _capacity; }
     void reserve(int n = 0) { if (n > (_length + 1)) resize_buffer(n + 1); }
     void clear();
@@ -58,7 +58,7 @@ public:
     static const int npos = -1;
 
 private:
-    const char _null = 0;
+    static const char _null = 0;
     char *_buffer;
     int _capacity;
     int _length;
