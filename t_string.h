@@ -49,9 +49,13 @@ public:
     string& append(const char* s) { return (*this += s); }
     string& append(const char* s, int n);
     string& append(int n, char c);
-
-    //push_back
-    //assign
+    void push_back(char c) { *this += c; }
+    string& assign(const string& str) { return (*this = str); }
+    string& assign(const string& str, int subpos, int sublen); // TODO
+    string& assign(const char *s) { return (*this = s); }
+    string& assign(const char *s, int n); // TODO
+    string& assign(int n, char c); // TODO
+    string& assign(string&& str); // TODO
     //insert
     //erase
     //replace
@@ -70,6 +74,12 @@ private:
     int _capacity;
     int _length;
     void resize_buffer(int size);
+
+    friend string operator+(const string &lhs, const string &rhs);
+    friend string operator+(const string &lhs, const char *rhs);
+    friend string operator+(const char *lhs, const string &rhs);
+    friend string operator+(const string &lhs, char rhs);
+    friend string operator+(char lhs, const string &rhs);
 };
 
 string operator+ (const string& lhs, const string& rhs);

@@ -105,6 +105,7 @@ string& string::operator= (const char* str)
         int len = strlen(str);
         resize_buffer(len + 1);
         CopyMem(str, _buffer, len + 1);
+        _length = len;
     }
     else
         resize_buffer(0);
@@ -265,12 +266,120 @@ string& string::append(const string &str, int subpos, int sublen)
             resize_buffer(_length + len + 1);
 
         CopyMem(str._buffer + subpos, _buffer + _length, len + 1);
-        _length = _length + len;
+        _length += len;
     }
     return *this;
 }
 
-bool operator== (const string& lhs, const string& rhs)
+string& string::append(const char *s, int n)
+{
+    if (s != NULL)
+    {
+        int len = strlen(s);
+        
+        if (len > n)
+            len = n;
+
+        if (_length + len >= _capacity)
+            resize_buffer(_length + len + 1);
+        
+        CopyMem(s, _buffer + _length, len);
+        _length += len;
+    }
+    return *this;
+}
+
+string& string::append(int n, char c)
+{
+    if (n > 0)
+    {
+        if (_length + n >= _capacity)
+            resize_buffer(_length + n + 1);
+        
+        for (int i=0; i < n; i++)
+            _buffer[_length + i] = c;
+        
+        _buffer[_length + n] = 0;
+        _length += n;
+    }
+
+    return *this;
+}
+
+string operator+(const string &lhs, const string &rhs)
+{
+    string result;
+
+    result.resize_buffer(lhs._length + rhs._length + 1);
+    CopyMem(lhs._buffer, result._buffer, lhs._length);
+    CopyMem(rhs._buffer, result._buffer + lhs._length, rhs._length + 1);
+    result._length = lhs._length + rhs._length;
+
+    return result;
+}
+
+string operator+(const string &lhs, const char *rhs)
+{
+    if (rhs != NULL)
+    {
+        string result;
+
+        int len = strlen(rhs);
+        result.resize_buffer(lhs._length + len + 1);
+        CopyMem(lhs._buffer, result._buffer, lhs._length);
+        CopyMem(rhs, result._buffer + lhs._length, len + 1);
+        result._length = lhs._length + len;
+
+        return result;
+    }
+    else
+        return lhs;
+}
+
+string operator+(const char *lhs, const string &rhs)
+{
+    if (lhs != NULL)
+    {
+        string result;
+
+        int len = strlen(lhs);
+        result.resize_buffer(len + rhs._length + 1);
+        CopyMem(lhs, result._buffer, len);
+        CopyMem(rhs._buffer, result._buffer + len, rhs._length + 1);
+        result._length = len + rhs._length;
+
+        return result;
+    }
+    else
+        return rhs;
+}
+
+string operator+(const string &lhs, char rhs)
+{
+    string result;
+
+    result.resize_buffer(lhs._length + 2);
+    CopyMem(lhs._buffer, result._buffer, lhs._length);
+    result._buffer[lhs._length] = rhs;
+    result._buffer[lhs._length + 1] = 0;
+    result._length = lhs._length + 1;
+
+    return result;
+}
+
+string operator+(char lhs, const string &rhs)
+{
+    string result;
+        
+    result.resize_buffer(rhs._length + 2);
+    result._buffer[0] = lhs;
+    CopyMem(rhs._buffer, result._buffer + 1, rhs._length + 1);
+    result._length = rhs._length + 1;
+
+    return result;
+}
+
+bool operator==(const string &lhs, const string &rhs)
 {
     return (strcmp(lhs.c_str(), rhs.c_str()) == 0);
 }
