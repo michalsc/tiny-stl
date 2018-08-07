@@ -56,7 +56,10 @@ public:
     string& assign(const char *s, int n);
     string& assign(int n, char c);
     string& assign(string&& str);
-    //insert
+    string& insert(int pos, const string& str);
+    string& insert(int pos, const string& str, int subpos, int sublen);
+    string& insert(int pos, const char* s);
+    string& insert(int pos, const char* s, int n);
     //erase
     //replace
     void swap(string& str);

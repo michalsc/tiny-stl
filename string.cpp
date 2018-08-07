@@ -52,7 +52,7 @@ void FreeMem(void *ptr, int size)
 
 void CopyMem(const void *src, void *dst, int size)
 {
-    memcpy(dst, src, size);
+    memmove(dst, src, size);
 }
 
 const char string::_null = 0;
@@ -396,6 +396,90 @@ string& string::assign(string&& str)
     str._buffer = NULL;
     str._capacity = 0;
     str._length = 0;
+
+    return *this;
+}
+
+string& string::insert(int pos, const string& str)
+{
+    if (pos > _length)
+        pos = _length;
+
+    if (_length + str._length + 1 > _capacity)
+        resize_buffer(_length + str._length + 1);
+
+    CopyMem(_buffer + pos, _buffer + pos + str._length, _length - pos + 1);
+    CopyMem(str._buffer, _buffer + pos, str._length);
+    
+    _length += str._length;
+
+    return *this;
+}
+
+string& string::insert(int pos, const string& str, int subpos, int sublen)
+{
+    if (subpos < str._length)
+    {
+        if (sublen > subpos + str._length)
+            sublen = str._length - subpos;
+
+        if (pos > _length)
+            pos = _length;
+
+        if (_length + sublen + 1 > _capacity)
+            resize_buffer(_length + sublen + 1);
+
+        CopyMem(_buffer + pos, _buffer + pos + sublen, _length - pos + 1);
+        CopyMem(str._buffer + subpos, _buffer + pos, sublen);
+        
+        _length += sublen;
+
+    }
+
+    return *this;
+}
+
+string& string::insert(int pos, const char* s)
+{
+    if (s)
+    {
+        if (pos > _length)
+            pos = _length;
+        
+        int len = strlen(s);
+
+        if (_length + len + 1 > _capacity)
+            resize_buffer(_length + len + 1);
+
+        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        CopyMem(s, _buffer + pos, len);
+        
+        _length += len;
+    }
+
+    return *this;
+}
+
+string& string::insert(int pos, const char* s, int n)
+{
+    if (s)
+    {
+        if (pos > _length)
+            pos = _length;
+        
+        int len = strlen(s);
+
+        if (len > n)
+            len = n;
+
+        if (_length + len + 1 > _capacity)
+            resize_buffer(_length + len + 1);
+
+        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        CopyMem(s, _buffer + pos, len);
+        
+        _length += len;
+    }
 
     return *this;
 }

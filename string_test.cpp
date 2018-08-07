@@ -109,6 +109,25 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
             str.assign(10, '*');
             CHECK( str == "**********" );
         }
+
+        {
+            t_std::string str="to be question";
+            t_std::string str2="the ";
+            t_std::string str3="or not to be";
+
+            // used in the same order as described above:
+            str.insert(6, str2);                 // to be (the )question
+            CHECK( str == "to be the question" );
+
+            str.insert(6,str3,3,4);             // to be (not )the question
+            CHECK( str == "to be not the question" );
+
+            str.insert(10,"that is cool",8);    // to be not (that is )the question
+            CHECK( str == "to be not that is the question" );
+
+            str.insert(10,"to be ");            // to be not (to be )that is the question
+            CHECK( str == "to be not to be that is the question" );
+        }
     }
 
 
