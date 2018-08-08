@@ -176,6 +176,21 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
             str.insert (it+2,str3.begin(),str3.begin()+3); // (or )
             CHECK ( str == "to be, or not to be: that is the question..." );
         }
+
+        {
+            t_std::string str ("This is an example sentence.");
+
+                                                    // "This is an example sentence."
+            str.erase (10,8);                       //            ^^^^^^^^
+            CHECK( str == "This is an sentence." );
+                                                    // "This is an sentence."
+            str.erase (str.begin()+9);              //           ^
+            CHECK( str == "This is a sentence." );
+                                                    // "This is a sentence."
+            str.erase (str.begin()+5, str.end()-9); //       ^^^^^
+            CHECK( str == "This sentence." );
+                                                   // "This sentence."
+        }
     }
 
 

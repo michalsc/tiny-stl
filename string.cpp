@@ -481,6 +481,42 @@ string::iterator string::insert(string::const_iterator p, int n, char c)
     return iterator(_buffer + pos);
 }
 
+string& string::erase(int pos, int len)
+{
+    if (pos < _length)
+    {
+        if (len == npos || pos + len > _length)
+            len = _length - pos;
+        
+        CopyMem(_buffer + pos + len, _buffer + pos, _length - pos - len);
+        _length-=len;
+        _buffer[_length] = 0;
+    }
+
+    return *this;
+}
+
+string::iterator string::erase(string::const_iterator p)
+{
+    int pos = p - const_iterator(_buffer);
+
+    CopyMem(_buffer + pos + 1, _buffer + pos, _length - pos + 1);
+
+    --_length;
+
+    return iterator(_buffer + pos);
+}
+
+string::iterator string::erase(string::const_iterator first, string::const_iterator last)
+{
+    int pos = first - const_iterator(_buffer);
+    int len = last - first;
+
+    erase(pos, len);
+
+    return iterator(_buffer + pos);
+}
+
 string operator+(const string &lhs, const string &rhs)
 {
     string result;

@@ -116,13 +116,9 @@ public:
     string(T first, T last) : _buffer(NULL), _capacity(0), _length(0)
     {
         T it(first);
-        char *b;
         resize_buffer(last - first + 1);
         _length = last - first;
-        for (b = _buffer; it != last; ++it)
-        {
-            *b++ = *it;
-        }
+        for (char *b = _buffer; it != last; ++it) *b++ = *it;
     }
     string(string&& str);
     ~string();
@@ -208,14 +204,13 @@ public:
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        for (char *b = _buffer + pos; it != last; ++it)
-        {
-            *b++ = *it; 
-        }
+        for (char *b = _buffer + pos; it != last; ++it) *b++ = *it; 
         _length += len;
         return iterator(_buffer + pos);
     }
     string& erase (int pos = 0, int len = npos);
+    iterator erase (const_iterator p);
+    iterator erase (const_iterator first, const_iterator last);
     //replace
     void swap(string& str);
 
