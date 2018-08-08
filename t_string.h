@@ -76,8 +76,21 @@ public:
     string(const string& str, int pos, int len = npos);
     string(const char *src, int n);
     string(int n, char c);
-    string(iterator first, iterator last);
-    string(reverse_iterator first, reverse_iterator last);
+    string(int n, int c) : string(n, (char)c) {}
+    template <class T = iterator>
+    string(T first, T last) : _buffer(NULL), _capacity(0), _length(0)
+    {
+        T it(first);
+        char *b;
+        resize_buffer(last - first + 1);
+        _length = last - first;
+        for (b = _buffer; it != last; ++it)
+        {
+            *b++ = *it;
+        }
+    }
+    //string(iterator first, iterator last);
+    //string(reverse_iterator first, reverse_iterator last);
     string(string&& str);
     ~string();
 
