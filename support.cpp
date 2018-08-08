@@ -59,11 +59,15 @@ int _strcmp_(const char *str1, const char *str2)
 {
     const char * s1 = str1;
     const char * s2 = str2;
-
+    unsigned char c1;
+    unsigned char c2;
     do {
-        if (*s1 == 0)
-            break;
-    } while (*s1++ == *s2++);
+        c1 = *s1++;
+        c2 = *s2++;
 
-    return static_cast<unsigned char>(*s1) - static_cast<unsigned char>(*s2);;
+        if (c1 == 0)
+            break;
+    } while (c1 == c2);
+
+    return static_cast<unsigned char>(c1) - static_cast<unsigned char>(c2);
 }
