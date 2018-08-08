@@ -508,92 +508,92 @@ string operator+(char lhs, const string &rhs)
 
 bool operator==(const string &lhs, const string &rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) == 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) == 0);
 }
 
 bool operator== (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) == 0);
+    return (_strcmp_(lhs, rhs.c_str()) == 0);
 }
 
 bool operator== (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) == 0);
+    return (_strcmp_(lhs.c_str(), rhs) == 0);
 }
 
 bool operator!= (const string& lhs, const string& rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) != 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) != 0);
 }
 
 bool operator!= (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) != 0);
+    return (_strcmp_(lhs, rhs.c_str()) != 0);
 }
 
 bool operator!= (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) != 0);
+    return (_strcmp_(lhs.c_str(), rhs) != 0);
 }
 
 bool operator< (const string& lhs, const string& rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) < 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) < 0);
 }
 
 bool operator< (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) < 0);
+    return (_strcmp_(lhs, rhs.c_str()) < 0);
 }
 
 bool operator< (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) < 0);
+    return (_strcmp_(lhs.c_str(), rhs) < 0);
 }
 
 bool operator<= (const string& lhs, const string& rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) <= 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) <= 0);
 }
 
 bool operator<= (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) <= 0);
+    return (_strcmp_(lhs, rhs.c_str()) <= 0);
 }
 
 bool operator<= (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) <= 0);
+    return (_strcmp_(lhs.c_str(), rhs) <= 0);
 }
 
 bool operator> (const string& lhs, const string& rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) > 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) > 0);
 }
 
 bool operator> (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) > 0);
+    return (_strcmp_(lhs, rhs.c_str()) > 0);
 }
 
 bool operator> (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) > 0);
+    return (_strcmp_(lhs.c_str(), rhs) > 0);
 }
 
 bool operator>= (const string& lhs, const string& rhs)
 {
-    return (strcmp(lhs.c_str(), rhs.c_str()) >= 0);
+    return (_strcmp_(lhs.c_str(), rhs.c_str()) >= 0);
 }
 
 bool operator>= (const char *  lhs, const string& rhs)
 {
-    return (strcmp(lhs, rhs.c_str()) >= 0);
+    return (_strcmp_(lhs, rhs.c_str()) >= 0);
 }
 
 bool operator>= (const string& lhs, const char *  rhs)
 {
-    return (strcmp(lhs.c_str(), rhs) >= 0);
+    return (_strcmp_(lhs.c_str(), rhs) >= 0);
 }
 
 void string::swap(string& str)
