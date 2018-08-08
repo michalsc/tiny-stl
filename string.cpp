@@ -53,6 +53,36 @@ string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
     _length = n;
 }
 
+string::string(iterator first, iterator last) : _buffer(NULL), _capacity(0), _length(0)
+{
+    iterator it(first);
+    char *b;
+    int len = last - first;
+    resize_buffer(len + 1);
+
+    for(b = _buffer; it != last; ++it)
+    {
+        *b++ = *it;
+    }
+
+    _length = len;
+}
+
+string::string(reverse_iterator first, reverse_iterator last) : _buffer(NULL), _capacity(0), _length(0)
+{
+    reverse_iterator it(first);
+    char *b;
+    int len = last - first;
+    resize_buffer(len + 1);
+    
+    for (b = _buffer; it != last; ++it)
+    {
+        *b++ = *it;
+    }
+
+    _length = len;
+}
+
 string::string(string&& str)
 {
     _buffer = str._buffer;

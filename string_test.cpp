@@ -13,6 +13,7 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
         t_std::string s5("Another character sequence", 12);
         t_std::string s6a(10, 'x');
         t_std::string s6b(10, 42);
+        t_std::string s7(s0.begin(), s0.begin() + 7);
 
         CHECK( s0 == "Initial string" );
         CHECK( s1.empty() );
@@ -23,6 +24,7 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
         CHECK( s5 == "Another char" );
         CHECK( s6a == "xxxxxxxxxx" );
         CHECK( s6b == "**********" );
+        CHECK( s7 == "Initial" );
     }
 
     SECTION("Testing operator=") {
@@ -50,6 +52,16 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
         for (auto it = str.rbegin(); it != str.rend(); ++it, --i)
         {
             CHECK( str_contents[i-1] == *it );
+        }
+
+        {
+            t_std::string s = "Hello, world";
+            auto r = s.rbegin();
+            r[7] = 'O'; // replaces 'o' with 'O'
+            r += 7;     // iterator now points at 'O'
+            t_std::string rev(r, s.rend());
+
+            CHECK( rev == "OlleH" );
         }
     }
 
