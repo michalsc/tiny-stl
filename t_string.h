@@ -2,11 +2,44 @@
 #define _T_STRING_H
 
 #include <ostream>
+#include <iterator>
 
 namespace t_std {
 
 class string {
 public:
+    class iterator : public std::iterator<std::random_access_iterator_tag, char> {
+        char *p;
+        char *begin;
+        char *end;
+    public:
+        iterator(char *ptr, char *beg, char *en) : p(ptr), begin(beg), end(en) {};
+        iterator(const iterator& it) : p(it.p), begin(it.begin), end(it.end) {};
+        iterator& operator++() { if (p < end) ++p; return *this; }
+        iterator operator++(int) { iterator tmp(*this); operator++(); return tmp; }
+        iterator& operator--() { if (p > begin) --p; return *this; }
+        iterator operator--(int) { iterator tmp(*this); operator--(); return tmp; }
+        bool operator==(const iterator& rhs) const { return p==rhs.p; }
+        bool operator!=(const iterator& rhs) const { return p!=rhs.p; }
+        char& operator*() { return *p; }
+    };
+    
+    class reverse_iterator : public std::iterator<std::random_access_iterator_tag, char> {
+        char *p;
+        char *begin;
+        char *end;
+    public:
+        reverse_iterator(char *ptr, char *beg, char *en) : p(ptr), begin(beg), end(en) {};
+        reverse_iterator(const reverse_iterator& it) : p(it.p), begin(it.begin), end(it.end) {};
+        iterator& operator++() { if (p > begin) --p; return *this; }
+        iterator operator++(int) { reverse_iterator tmp(*this); operator++(); return tmp; }
+        iterator& operator--() { if (p < end) ++p; return *this; }
+        iterator operator--(int) { reverse_iterator tmp(*this); operator--(); return tmp; }
+        bool operator==(const reverse_iterator& rhs) const { return p==rhs.p; }
+        bool operator!=(const reverse_iterator& rhs) const { return p!=rhs.p; }
+        char& operator*() { return *p; }
+    };
+
     string(const char *src = "");
     string(const string& str);
     string(const string& str, int pos, int len = npos);
@@ -21,10 +54,10 @@ public:
     string& operator= (string&& str);
 
     // Iterators
-// begin()
-// end()
-// rbegin()
-// rend()
+    iterator begin() { return iterator(_buffer, _buffer, _buffer + _length); }
+    iterator end() { return iterator(_buffer + _length, _buffer, _buffer + _length); }
+    reverse_iterator rbegin() { return reverse_iterator(_buffer + _length - 1, _buffer - 1, _buffer + _length - 1); }
+    reverse_iterator rend() { return reverse_iterator(_buffer - 1, _buffer + 1, _buffer + _length - 1); }
 
     // Capacity
     int size() { return _length; }

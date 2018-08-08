@@ -35,6 +35,24 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
         CHECK( str3 == "Test string: x" );
     }
 
+    SECTION("Testing iterators") {
+        char str_contents[] = "Test string";
+        t_std::string str(str_contents);
+        int i = 0;
+
+        for (auto it = str.begin(); it != str.end(); ++it, ++i)
+        {
+            CHECK( str_contents[i] == *it );
+        }
+
+        i = strlen(str_contents);
+
+        for (auto it = str.rbegin(); it != str.rend(); ++it, --i)
+        {
+            CHECK( str_contents[i-1] == *it );
+        }
+    }
+
     SECTION("Testing capacity functions") {
         t_std::string str("Test string");
 
