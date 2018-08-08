@@ -10,8 +10,6 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    
-
     t_std::string str = "Hello";
     t_std::string s0("Initial string");
 
@@ -37,7 +35,13 @@ int main(int argc, char **argv)
     printf("s6a: '%s'\n", s6a.c_str());
     printf("s6b: '%s'\n", s6b.c_str());
 
-    std::cout << s6b << std::endl;
+    for (auto it = s0.begin(); it != s0.end(); ++it)
+        printf("%c ", *it);
+    printf("\n");
+
+    for (auto it = s0.rbegin(); it != s0.rend(); ++it)
+        printf("%c ", *it);
+    printf("\n");
 
     return 0;
 }

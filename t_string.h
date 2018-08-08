@@ -8,6 +8,8 @@ namespace t_std {
 
 class string {
 public:
+    // Random access iterator with tiny bit of safety - it cannot go beyond 
+    // given boundaries.
     class iterator : public std::iterator<std::random_access_iterator_tag, char> {
         char *p;
         char *begin;
@@ -24,6 +26,8 @@ public:
         char& operator*() { return *p; }
     };
     
+    // Random access reverse iterator with tiny bit of safety - it cannot go beyond 
+    // given boundaries.
     class reverse_iterator : public std::iterator<std::random_access_iterator_tag, char> {
         char *p;
         char *begin;
@@ -40,6 +44,7 @@ public:
         char& operator*() { return *p; }
     };
 
+    // Constructors
     string(const char *src = "");
     string(const string& str);
     string(const string& str, int pos, int len = npos);
@@ -48,6 +53,7 @@ public:
     string(string&& str);
     ~string();
 
+    // Assignment operators
     string& operator= (const string& str);
     string& operator= (const char* str);
     string& operator= (char c);
@@ -145,6 +151,7 @@ bool operator>= (const string& lhs, const char*   rhs);
 
 void swap(string& s1, string& s2);
 
+// To be removed when used as standalone
 std::ostream &operator<<(std::ostream &os, string const &str);
 
 }
