@@ -230,7 +230,16 @@ public:
     // String operations
     const char * c_str() const { if (_length) return _buffer; else return &_null; }
     const char * data() const { if (_length) return _buffer; else return &_null; }
-    
+    // copy
+    // find
+    // rfind
+    // find_first_of
+    // find_last_of
+    // find_first_not_of
+    // find_last_not_of
+    // substr
+    // compare
+
     // Member constants
     static const int npos = -1;
 
@@ -274,6 +283,24 @@ bool operator>= (const char*   lhs, const string& rhs);
 bool operator>= (const string& lhs, const char*   rhs);
 
 void swap(string& s1, string& s2);
+
+string to_string(int val);
+string to_string(long val);
+string to_string(long long val);
+string to_string(unsigned val);
+string to_string(unsigned long val);
+string to_string(unsigned long long val);
+string to_string(float val);
+string to_string(double val);
+string to_string(void *val);
+
+int stoi(const string& str, int * idx = 0, int base = 10);
+long int stol(const string& str, int * idx = 0, int base = 10);
+unsigned long stoul(const string& str, int * idx = 0, int base = 10);
+long long stoll(const string& str, int * idx = 0, int base = 10);
+unsigned long long stoull(const string& str, int * idx = 0, int base = 10);
+float stof(const string& str, int * idx = 0);
+double stod(const string& str, int * idx = 0);
 
 // To be removed when used as standalone
 std::ostream &operator<<(std::ostream &os, string const &str);
