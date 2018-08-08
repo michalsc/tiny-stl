@@ -192,10 +192,10 @@ public:
     string& insert(int pos, const char* s);
     string& insert(int pos, const char* s, int n);
     string& insert(int pos, int n, const char c);
-    iterator insert (const_iterator p, char c);
-    iterator insert (const_iterator p, int n, char c);
+    iterator insert(const_iterator p, char c);
+    iterator insert(const_iterator p, int n, char c);
     template <class T>
-    iterator insert (iterator p, T first, T last) {
+    iterator insert(iterator p, T first, T last) {
         int pos = p - begin();
         int len = last - first;
         iterator it(first);
@@ -208,10 +208,23 @@ public:
         _length += len;
         return iterator(_buffer + pos);
     }
-    string& erase (int pos = 0, int len = npos);
-    iterator erase (const_iterator p);
-    iterator erase (const_iterator first, const_iterator last);
-    //replace
+    string& erase(int pos = 0, int len = npos);
+    iterator erase(const_iterator p);
+    iterator erase(const_iterator first, const_iterator last);
+
+    string& replace(int pos, int len, const string& str) { erase(pos, len); insert(pos, str); return *this; }
+    string& replace(const_iterator i1, const_iterator i2, const string& str) { int pos = erase(i1, i2) - iterator(_buffer); insert(pos, str); return *this; }
+    string& replace(int pos, int len, const string& str, int subpos, int sublen) { erase(pos, len); insert(pos, str, subpos, sublen); return *this; }
+    string& replace(int pos, int len, const char* s) { erase(pos, len); insert(pos, s); return *this; }
+    string& replace(const_iterator i1, const_iterator i2, const char* s) { int pos = erase(i1, i2) - iterator(_buffer); insert(pos, s); return *this; }
+    string& replace(int pos, int len, const char* s, int n) { erase(pos, len); insert(pos, s, n); return *this; }
+    string& replace(const_iterator i1, const_iterator i2, const char* s, int n) { int pos = erase(i1, i2) - iterator(_buffer); insert(pos, s, n); return *this; }
+    string& replace(int pos, int len, int n, char c) { erase(pos, len); insert(pos, n, c); return *this; }
+    string& replace(const_iterator i1, const_iterator i2, int n, char c) { iterator it = erase(i1, i2); insert(it, n, c); return *this; }
+    string& replace(const_iterator i1, const_iterator i2, int n, int c) { return replace(i1, i2, n, (char)c); }
+    template <class T>
+    string& replace(const_iterator i1, const_iterator i2, T first, T last) { iterator it = erase(i1, i2); insert(it, first, last); return *this; }
+
     void swap(string& str);
 
     // String operations

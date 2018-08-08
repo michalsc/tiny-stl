@@ -191,6 +191,40 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
             CHECK( str == "This sentence." );
                                                    // "This sentence."
         }
+
+        {
+            t_std::string base="this is a test string.";
+            t_std::string str2="n example";
+            t_std::string str3="sample phrase";
+            t_std::string str4="useful.";
+
+            // replace signatures used in the same order as described above:
+
+            // Using positions:                 0123456789*123456789*12345
+            t_std::string str=base;         // "this is a test string."
+            str.replace(9,5,str2);          // "this is an example string." (1)
+            CHECK( str == "this is an example string." );
+            str.replace(19,6,str3,7,6);     // "this is an example phrase." (2)
+            CHECK( str == "this is an example phrase." );
+            str.replace(8,10,"just a");     // "this is just a phrase."     (3)
+            CHECK( str == "this is just a phrase." );
+            str.replace(8,6,"a shorty",7);  // "this is a short phrase."    (4)
+            CHECK( str == "this is a short phrase." );
+            str.replace(22,1,3,'!');        // "this is a short phrase!!!"  (5)
+            CHECK( str == "this is a short phrase!!!" );
+
+            // Using iterators:                                               0123456789*123456789*
+            str.replace(str.begin(),str.end()-3,str3);                    // "sample phrase!!!"      (1)
+            CHECK( str == "sample phrase!!!" );
+            str.replace(str.begin(),str.begin()+6,"replace");             // "replace phrase!!!"     (3)
+            CHECK( str == "replace phrase!!!" );
+            str.replace(str.begin()+8,str.begin()+14,"is coolness",7);    // "replace is cool!!!"    (4)
+            CHECK( str == "replace is cool!!!" );
+            str.replace(str.begin()+12,str.end()-4,4,'o');                // "replace is cooool!!!"  (5)
+            CHECK( str == "replace is cooool!!!" );
+            str.replace(str.begin()+11,str.end(),str4.begin(),str4.end());// "replace is useful."    (6)
+            CHECK( str == "replace is useful." );
+        }
     }
 
 
