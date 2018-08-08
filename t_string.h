@@ -12,36 +12,62 @@ public:
     // given boundaries.
     class iterator : public std::iterator<std::random_access_iterator_tag, char> {
         char *p;
-        char *begin;
-        char *end;
     public:
-        iterator(char *ptr, char *beg, char *en) : p(ptr), begin(beg), end(en) {};
-        iterator(const iterator& it) : p(it.p), begin(it.begin), end(it.end) {};
-        iterator& operator++() { if (p < end) ++p; return *this; }
+        iterator() : p(nullptr) {};
+        iterator(char *ptr) : p(ptr) {};
+        iterator(const iterator& it) : p(it.p) {};
+        iterator& operator+=(difference_type rhs) { p += rhs; return *this; }
+        iterator& operator-=(difference_type rhs) { p -= rhs; return *this; }
+        char& operator*() const { return *p; }
+        char* operator->() const { return p; }
+        char& operator[](difference_type rhs) const { return p[rhs]; }
+
+        iterator& operator++() { ++p; return *this; }
+        iterator& operator--() { --p; return *this; }
         iterator operator++(int) { iterator tmp(*this); operator++(); return tmp; }
-        iterator& operator--() { if (p > begin) --p; return *this; }
         iterator operator--(int) { iterator tmp(*this); operator--(); return tmp; }
-        bool operator==(const iterator& rhs) const { return p==rhs.p; }
-        bool operator!=(const iterator& rhs) const { return p!=rhs.p; }
-        char& operator*() { return *p; }
+        difference_type operator-(const iterator& rhs) const { return (p - rhs.p); }
+        iterator operator+(difference_type rhs) const { return iterator(p + rhs); }
+        iterator operator-(difference_type rhs) const { return iterator(p - rhs); }
+        friend inline iterator operator+(difference_type lhs, const iterator &rhs) { return iterator(lhs + rhs.p); }
+        
+        bool operator==(const iterator& rhs) const { return p == rhs.p; }
+        bool operator!=(const iterator& rhs) const { return p != rhs.p; }
+        bool operator>(const iterator& rhs) const { return p > rhs.p; }
+        bool operator>=(const iterator &rhs) const { return p >= rhs.p; }
+        bool operator<(const iterator &rhs) const { return p < rhs.p; }
+        bool operator<=(const iterator &rhs) const { return p <= rhs.p; }
     };
     
     // Random access reverse iterator with tiny bit of safety - it cannot go beyond 
     // given boundaries.
-    class reverse_iterator : public std::iterator<std::random_access_iterator_tag, char> {
+    class reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, char> {
         char *p;
-        char *begin;
-        char *end;
     public:
-        reverse_iterator(char *ptr, char *beg, char *en) : p(ptr), begin(beg), end(en) {};
-        reverse_iterator(const reverse_iterator& it) : p(it.p), begin(it.begin), end(it.end) {};
-        iterator& operator++() { if (p > begin) --p; return *this; }
+        reverse_iterator() : p(nullptr) {};
+        reverse_iterator(char *ptr) : p(ptr) {};
+        reverse_iterator(const reverse_iterator& it) : p(it.p) {};
+        iterator& operator+=(difference_type rhs) { p -= rhs; return *this; }
+        iterator& operator-=(difference_type rhs) { p += rhs; return *this; }
+        char& operator*() const { return *p; }
+        char* operator->() const { return p; }
+        char& operator[](difference_type rhs) const { return p[-rhs]; }
+
+        iterator& operator++() { --p; return *this; }
+        iterator& operator--() { ++p; return *this; }
         iterator operator++(int) { reverse_iterator tmp(*this); operator++(); return tmp; }
-        iterator& operator--() { if (p < end) ++p; return *this; }
         iterator operator--(int) { reverse_iterator tmp(*this); operator--(); return tmp; }
+        difference_type operator-(const reverse_iterator &rhs) const { return (rhs.p - p); }
+        iterator operator+(difference_type rhs) const { return reverse_iterator(p - rhs); }
+        iterator operator-(difference_type rhs) const { return reverse_iterator(p + rhs); }
+        friend inline iterator operator+(difference_type lhs, const reverse_iterator &rhs) { return reverse_iterator(rhs.p - lhs); }
+
         bool operator==(const reverse_iterator& rhs) const { return p==rhs.p; }
         bool operator!=(const reverse_iterator& rhs) const { return p!=rhs.p; }
-        char& operator*() { return *p; }
+        bool operator>(const reverse_iterator &rhs) const { return p < rhs.p; }
+        bool operator>=(const reverse_iterator &rhs) const { return p <= rhs.p; }
+        bool operator<(const reverse_iterator &rhs) const { return p > rhs.p; }
+        bool operator<=(const reverse_iterator &rhs) const { return p >= rhs.p; }
     };
 
     // Constructors
@@ -50,6 +76,8 @@ public:
     string(const string& str, int pos, int len = npos);
     string(const char *src, int n);
     string(int n, char c);
+    string(iterator first, iterator last);
+    string(reverse_iterator first, reverse_iterator last);
     string(string&& str);
     ~string();
 
@@ -60,10 +88,10 @@ public:
     string& operator= (string&& str);
 
     // Iterators
-    iterator begin() { return iterator(_buffer, _buffer, _buffer + _length); }
-    iterator end() { return iterator(_buffer + _length, _buffer, _buffer + _length); }
-    reverse_iterator rbegin() { return reverse_iterator(_buffer + _length - 1, _buffer - 1, _buffer + _length - 1); }
-    reverse_iterator rend() { return reverse_iterator(_buffer - 1, _buffer + 1, _buffer + _length - 1); }
+    iterator begin() { return iterator(_buffer); }
+    iterator end() { return iterator(_buffer + _length); }
+    reverse_iterator rbegin() { return reverse_iterator(_buffer + _length - 1); }
+    reverse_iterator rend() { return reverse_iterator(_buffer - 1); }
 
     // Capacity
     int size() { return _length; }
