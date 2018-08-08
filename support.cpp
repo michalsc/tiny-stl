@@ -71,3 +71,12 @@ int _strcmp_(const char *str1, const char *str2)
 
     return static_cast<unsigned char>(c1) - static_cast<unsigned char>(c2);
 }
+
+int _strlen_(const char *str)
+{
+    int len = 0;
+
+    if (str) while(*str++ != 0) len++;
+
+    return len;
+}

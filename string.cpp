@@ -11,7 +11,7 @@ string::string(const char *src) : _buffer(NULL), _capacity(0), _length(0)
 {
     if (src)
     {
-        int len = strlen(src);
+        int len = _strlen_(src);
 
         resize_buffer(len + 1);
         _length = len;
@@ -76,7 +76,7 @@ string& string::operator= (const char* str)
 {
     if (str)
     {
-        int len = strlen(str);
+        int len = _strlen_(str);
         resize_buffer(len + 1);
         CopyMem(str, _buffer, len + 1);
         _length = len;
@@ -206,7 +206,7 @@ string& string::operator+= (const string& str)
 
 string& string::operator+= (const char *str)
 {
-    int len = strlen(str) + 1;
+    int len = _strlen_(str) + 1;
 
     if (_capacity - _length < len)
         resize_buffer(_length + len);
@@ -250,7 +250,7 @@ string& string::append(const char *s, int n)
 {
     if (s != NULL)
     {
-        int len = strlen(s);
+        int len = _strlen_(s);
         
         if (len > n)
             len = n;
@@ -308,7 +308,7 @@ string& string::assign(const char *s, int n)
 {
     if (s)
     {
-        int len = strlen(s);
+        int len = _strlen_(s);
         
         if (len > n)
             len = n;
@@ -393,7 +393,7 @@ string& string::insert(int pos, const char* s)
         if (pos > _length)
             pos = _length;
         
-        int len = strlen(s);
+        int len = _strlen_(s);
 
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
@@ -414,7 +414,7 @@ string& string::insert(int pos, const char* s, int n)
         if (pos > _length)
             pos = _length;
         
-        int len = strlen(s);
+        int len = _strlen_(s);
 
         if (len > n)
             len = n;
@@ -535,7 +535,7 @@ string operator+(const string &lhs, const char *rhs)
     {
         string result;
 
-        int len = strlen(rhs);
+        int len = _strlen_(rhs);
         result.resize_buffer(lhs._length + len + 1);
         CopyMem(lhs._buffer, result._buffer, lhs._length);
         CopyMem(rhs, result._buffer + lhs._length, len + 1);
@@ -553,7 +553,7 @@ string operator+(const char *lhs, const string &rhs)
     {
         string result;
 
-        int len = strlen(lhs);
+        int len = _strlen_(lhs);
         result.resize_buffer(len + rhs._length + 1);
         CopyMem(lhs, result._buffer, len);
         CopyMem(rhs._buffer, result._buffer + len, rhs._length + 1);
