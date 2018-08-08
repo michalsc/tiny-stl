@@ -1,59 +1,9 @@
 #include "t_string.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "support.h"
+
 #include <ostream>
 
 namespace t_std {
-
-#define MEMF_ANY    1
-#define MEMF_CLEAR  2
-
-void * AllocMem(int size, int type)
-{
-    int *ptr = reinterpret_cast<int *>(malloc(size + 32));
-    ptr[0] = size;
-    ptr[1] = 0xdeadbeef;
-    ptr[2] = 0xdeadbeef;
-    ptr[3] = 0xdeadbeef;
-
-    ptr[4 + size/4] = 0xcafebabe;
-    ptr[5 + size/4] = 0xcafebabe;
-    ptr[6 + size/4] = 0xcafebabe;
-    ptr[7 + size/4] = 0xcafebabe;
-
-    if (type & MEMF_CLEAR)
-    {
-        bzero(&ptr[4], size);
-    }
-
-    return &ptr[4];
-}
-
-void FreeMem(void *ptr, int size)
-{
-    unsigned int *p = reinterpret_cast<unsigned int *>(ptr);
-
-    p -= 4;
-    if (*p != (unsigned int)size)
-        printf("Size mismatch at FreeMem!! %d != %d\n", *p, size);
-
-    if (p[1] != 0xdeadbeef || p[2] != 0xdeadbeef || p[3] != 0xdeadbeef)
-    {
-        printf("FreeMem(): left wall damaged %08x%08x%08x\n", p[1], p[2], p[3]);
-    }
-    if (p[4 + size/4] != 0xcafebabe || p[5+size/4] != 0xcafebabe || p[6+size/4] != 0xcafebabe || p[7+size/4] != 0xcafebabe)
-    {
-        printf("FreeMem(): right wall damaged %08x%08x%08x%08x\n", p[4 + size/4], p[5+size/4], p[6+size/4],p[7+size/4]);
-    }
-    
-    free(p);
-}
-
-void CopyMem(const void *src, void *dst, int size)
-{
-    memmove(dst, src, size);
-}
 
 const char string::_null = 0;
 
@@ -98,8 +48,7 @@ string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
 string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
 {
     resize_buffer(n + 1);
-    for (int i=0; i < n; i++)
-        _buffer[i] = c;
+    SetMem(_buffer, n, c);
     _buffer[n] = 0;
     _length = n;
 }
@@ -229,7 +178,7 @@ void string::resize(int n, char c)
         if (n >= _capacity)
             resize_buffer(n + 1);
         
-        memset(_buffer + _length, c, n - _length);
+        SetMem(_buffer + _length, n - _length, c);
         _length = n;
     }
 }
@@ -238,7 +187,7 @@ void string::clear()
 {
     if (_buffer && _length > 0)
     {
-        memset(_buffer, 0, _length);
+        SetMem(_buffer, _length, 0);
         _length = 0;
     }
 }
@@ -323,9 +272,8 @@ string& string::append(int n, char c)
         if (_length + n >= _capacity)
             resize_buffer(_length + n + 1);
         
-        for (int i=0; i < n; i++)
-            _buffer[_length + i] = c;
-        
+        SetMem(_buffer + _length, n, c);
+
         _buffer[_length + n] = 0;
         _length += n;
     }
@@ -378,7 +326,7 @@ string& string::assign(const char *s, int n)
 string& string::assign(int n, char c)
 {
     resize_buffer(n + 1);
-    memset(_buffer, c, n);
+    SetMem(_buffer, n, c);
     _buffer[n] = 0;
     _length = n;
 
