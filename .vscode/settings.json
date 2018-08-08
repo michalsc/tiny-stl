@@ -13,6 +13,12 @@
         "string_view": "cpp",
         "vector": "cpp",
         "memory": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "__functional_03": "cpp",
+        "__string": "cpp",
+        "functional": "cpp",
+        "system_error": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp"
     }
 }

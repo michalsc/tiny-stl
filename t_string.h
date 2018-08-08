@@ -4,10 +4,13 @@
 #include <ostream>
 #include <iterator>
 
+#include "support.h"
+
 namespace t_std {
 
 class string {
 public:
+    class const_iterator;
     // Random access iterator with tiny bit of safety - it cannot go beyond 
     // given boundaries.
     class iterator : public std::iterator<std::random_access_iterator_tag, char> {
@@ -37,6 +40,38 @@ public:
         bool operator>=(const iterator &rhs) const { return p >= rhs.p; }
         bool operator<(const iterator &rhs) const { return p < rhs.p; }
         bool operator<=(const iterator &rhs) const { return p <= rhs.p; }
+
+        friend class string::const_iterator;
+    };
+    
+    class const_iterator : public std::iterator<std::random_access_iterator_tag, char> {
+        const char *p;
+    public:
+        const_iterator() : p(nullptr) {};
+        const_iterator(const char *ptr) : p(ptr) {};
+        const_iterator(const const_iterator& it) : p(it.p) {};
+        const_iterator(const string::iterator& it) : p(it.p) {};
+        const_iterator& operator+=(difference_type rhs) { p += rhs; return *this; }
+        const_iterator& operator-=(difference_type rhs) { p -= rhs; return *this; }
+        const char& operator*() const { return *p; }
+        const char* operator->() const { return p; }
+        const char& operator[](difference_type rhs) const { return p[rhs]; }
+
+        const_iterator& operator++() { ++p; return *this; }
+        const_iterator& operator--() { --p; return *this; }
+        const_iterator operator++(int) { const_iterator tmp(*this); operator++(); return tmp; }
+        const_iterator operator--(int) { const_iterator tmp(*this); operator--(); return tmp; }
+        difference_type operator-(const const_iterator& rhs) const { return (p - rhs.p); }
+        const_iterator operator+(difference_type rhs) const { return const_iterator(p + rhs); }
+        const_iterator operator-(difference_type rhs) const { return const_iterator(p - rhs); }
+        friend inline iterator operator+(difference_type lhs, const const_iterator &rhs) { return const_iterator(lhs + rhs.p); }
+        
+        bool operator==(const const_iterator& rhs) const { return p == rhs.p; }
+        bool operator!=(const const_iterator& rhs) const { return p != rhs.p; }
+        bool operator>(const const_iterator& rhs) const { return p > rhs.p; }
+        bool operator>=(const const_iterator &rhs) const { return p >= rhs.p; }
+        bool operator<(const const_iterator &rhs) const { return p < rhs.p; }
+        bool operator<=(const const_iterator &rhs) const { return p <= rhs.p; }
     };
     
     // Random access reverse iterator with tiny bit of safety - it cannot go beyond 
@@ -89,8 +124,6 @@ public:
             *b++ = *it;
         }
     }
-    //string(iterator first, iterator last);
-    //string(reverse_iterator first, reverse_iterator last);
     string(string&& str);
     ~string();
 
@@ -129,18 +162,60 @@ public:
     string& append(const char* s) { return (*this += s); }
     string& append(const char* s, int n);
     string& append(int n, char c);
+    string& append(int n, int c) { return append(n, (char)c); }
+    template <class T = iterator>
+    string& append(T first, T last) {
+        int len = last - first;
+        T it(first);
+        if (len + _length >= _capacity) resize_buffer(len + _length + 1);
+        for (char *b = _buffer + _length; it != last; ++it) *b++ = *it;
+        _length += len;
+        _buffer[_length] = 0;
+        return *this;
+    }
     void push_back(char c) { *this += c; }
     string& assign(const string& str);
     string& assign(const string& str, int subpos, int sublen);
     string& assign(const char *s) { return (*this = s); }
     string& assign(const char *s, int n);
     string& assign(int n, char c);
+    string& assign(int n, int c) { return assign(n, (char)c); }
+    template <class T = iterator>
+    string& assign(T first, T last) {
+        int len = last - first;
+        T it(first);
+        resize_buffer(len + 1);
+        for (char *b = _buffer; it != last; ++it) *b++ = *it;
+        _length = len;
+        _buffer[_length] = 0;
+        return *this;
+    }
     string& assign(string&& str);
     string& insert(int pos, const string& str);
     string& insert(int pos, const string& str, int subpos, int sublen);
     string& insert(int pos, const char* s);
     string& insert(int pos, const char* s, int n);
-    //erase
+    string& insert(int pos, int n, const char c);
+    iterator insert (const_iterator p, char c);
+    iterator insert (const_iterator p, int n, char c);
+    template <class T>
+    iterator insert (iterator p, T first, T last) {
+        int pos = p - begin();
+        int len = last - first;
+        iterator it(first);
+        if (pos > _length)
+            pos = _length;
+        if (_length + len + 1 > _capacity)
+            resize_buffer(_length + len + 1);
+        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        for (char *b = _buffer + pos; it != last; ++it)
+        {
+            *b++ = *it; 
+        }
+        _length += len;
+        return iterator(_buffer + pos);
+    }
+    string& erase (int pos = 0, int len = npos);
     //replace
     void swap(string& str);
 

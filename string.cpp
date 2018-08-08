@@ -431,6 +431,56 @@ string& string::insert(int pos, const char* s, int n)
     return *this;
 }
 
+string& string::insert(int pos, int n, char c)
+{
+    if (n)
+    {
+        if (pos > _length)
+            pos = _length;
+        
+        int len = n;
+
+        if (_length + len + 1 > _capacity)
+            resize_buffer(_length + len + 1);
+
+        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        SetMem(_buffer + pos, len, c);
+        
+        _length += len;
+    }
+
+    return *this;
+}
+
+string::iterator string::insert(string::const_iterator p, char c)
+{
+    return insert(p, 1, c);
+}
+
+string::iterator string::insert(string::const_iterator p, int n, char c)
+{
+    int pos = p - const_iterator(_buffer);
+
+    if (n)
+    {
+ 
+        if (pos > _length)
+            pos = _length;
+        
+        int len = n;
+
+        if (_length + len + 1 > _capacity)
+            resize_buffer(_length + len + 1);
+        
+        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        SetMem(_buffer + pos, len, c);
+        
+        _length += len;
+    }
+
+    return iterator(_buffer + pos);
+}
+
 string operator+(const string &lhs, const string &rhs)
 {
     string result;

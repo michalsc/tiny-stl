@@ -115,8 +115,10 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
             str.append("dots are cool", 5); // "dots "
             str.append("here: ");           // "here: "
             str.append(10u, '.');           // ".........."
+            str.append(str3.begin()+8,str3.end());  // " and then 5 more"
+            str.append(5,0x2E);
 
-            CHECK( str == "Writing 10 dots here: .........." );
+            CHECK( str == "Writing 10 dots here: .......... and then 5 more....." );
         }
         {
             t_std::string str;
@@ -138,12 +140,16 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
 
             str.assign(10, '*');
             CHECK( str == "**********" );
+
+            str.assign(base.begin()+16,base.end()-12);
+            CHECK( str == "fox jumps over" );
         }
 
         {
             t_std::string str="to be question";
             t_std::string str2="the ";
             t_std::string str3="or not to be";
+            t_std::string::iterator it;
 
             // used in the same order as described above:
             str.insert(6, str2);                 // to be (the )question
@@ -157,6 +163,18 @@ TEST_CASE("t_std::string class", "[t_std::string]") {
 
             str.insert(10,"to be ");            // to be not (to be )that is the question
             CHECK( str == "to be not to be that is the question" );
+
+            str.insert(15,1,':');               // to be not to be(:) that is the question
+            CHECK( str == "to be not to be: that is the question" );
+
+            it = str.insert(str.begin()+5,','); // to be(,) not to be: that is the question
+            CHECK ( str == "to be, not to be: that is the question" );
+
+            str.insert (str.end(),3,'.');
+            CHECK ( str == "to be, not to be: that is the question..." );
+
+            str.insert (it+2,str3.begin(),str3.begin()+3); // (or )
+            CHECK ( str == "to be, or not to be: that is the question..." );
         }
     }
 
