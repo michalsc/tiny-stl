@@ -1,6 +1,5 @@
 #include "t_string.h"
 #include "support.h"
-#include <string.h>
 
 #include <ostream>
 
