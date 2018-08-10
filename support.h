@@ -132,4 +132,10 @@ for                                                    \
     node = (void *)(((struct MinNode *)(node))->mln_Succ)  \
 )
 
+#define ForeachNodeSafe(list, current, next)                  \
+    for (                                                     \
+        current = (void *)(((struct MinList *)(list))->mlh_Head); \
+        (next = (void *)((struct MinNode *)(current))->mln_Succ); \
+        current = (void *)next)
+
 #endif // _SUPPORT_H

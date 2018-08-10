@@ -21,6 +21,7 @@
         "__config": "cpp",
         "__nullptr": "cpp",
         "algorithm": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "chrono": "cpp"
     }
 }
