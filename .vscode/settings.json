@@ -19,6 +19,8 @@
         "functional": "cpp",
         "system_error": "cpp",
         "__config": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "algorithm": "cpp",
+        "type_traits": "cpp"
     }
 }

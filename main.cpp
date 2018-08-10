@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "t_string.h"
+#include "t_list.h"
 
 static const char __attribute__((used)) version[] = "\0$VER: MiniStd " VERSION_STRING;
 
@@ -9,6 +10,10 @@ int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
+
+    t_std::list<int> list;
+
+    list.clear();
 
     t_std::string str = "Hello";
     t_std::string s0("Initial string");

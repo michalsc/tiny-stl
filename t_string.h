@@ -8,6 +8,33 @@
 
 namespace t_std {
 
+// Exception-free std::string reimplementation.
+// Unimplemented methods:
+//
+// copy
+// find
+// rfind
+// find_first_of
+// find_last_of
+// find_first_not_of
+// find_last_not_of
+// substr
+// compare
+
+// Unimplemented functions:
+//
+// string to_string(float val);
+// string to_string(double val);
+// string to_string(void *val);
+// 
+// int stoi(const string& str, int * idx = 0, int base = 10);
+// long int stol(const string& str, int * idx = 0, int base = 10);
+// unsigned long stoul(const string& str, int * idx = 0, int base = 10);
+// long long stoll(const string& str, int * idx = 0, int base = 10);
+// unsigned long long stoull(const string& str, int * idx = 0, int base = 10);
+// float stof(const string& str, int * idx = 0);
+// double stod(const string& str, int * idx = 0);
+
 class string {
 public:
     class const_iterator;
