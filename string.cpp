@@ -517,6 +517,20 @@ string::iterator string::erase(string::const_iterator first, string::const_itera
     return iterator(_buffer + pos);
 }
 
+int string::copy(char *c, int len, int pos)
+{
+    if (pos < _length)
+    {
+        if (pos + len > _length)
+            len = _length - pos;
+        
+        CopyMem(_buffer + pos, c, len);
+
+        return len;
+    }
+    return 0;
+}
+
 string operator+(const string &lhs, const string &rhs)
 {
     string result;
@@ -693,6 +707,165 @@ void string::swap(string& str)
     str._buffer = _buff;
     str._capacity = _cap;
     str._length = _len;
+}
+
+string to_string(int val)
+{
+    string str(25, ' ');
+    bool minus = (val < 0) ? true : false;
+    string::reverse_iterator it;
+
+    if (minus)
+        val = -val;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    if (minus) {
+        ++it;
+        *it = '-';
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
+}
+
+string to_string(long val)
+{
+    string str(25, ' ');
+    bool minus = (val < 0) ? true : false;
+    string::reverse_iterator it;
+
+    if (minus)
+        val = -val;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    if (minus) {
+        ++it;
+        *it = '-';
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
+}
+
+string to_string(long long val)
+{
+    string str(25, ' ');
+    bool minus = (val < 0) ? true : false;
+    string::reverse_iterator it;
+
+    if (minus)
+        val = -val;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    if (minus) {
+        ++it;
+        *it = '-';
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
+}
+
+string to_string(unsigned long long val)
+{
+    string str(25, ' ');
+    string::reverse_iterator it;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
+}
+
+string to_string(unsigned long val)
+{
+    string str(25, ' ');
+    string::reverse_iterator it;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
+}
+
+string to_string(unsigned val)
+{
+    string str(25, ' ');
+    string::reverse_iterator it;
+
+    for (it = str.rbegin(); it != str.rend(); ++it)
+    {
+        *it = '0' + val % 10;
+        val /= 10;
+        if (val == 0)
+            break;
+    }
+
+    ++it;
+    int cnt = str.rend() - it;
+    
+    if (cnt > 0)
+        str.erase(0, cnt);
+    
+    return str;
 }
 
 std::ostream &operator<<(std::ostream &os, string const &str)

@@ -257,7 +257,7 @@ public:
     // String operations
     const char * c_str() const { if (_length) return _buffer; else return &_null; }
     const char * data() const { if (_length) return _buffer; else return &_null; }
-    // copy
+    int copy(char *s, int len, int pos = 0);
     // find
     // rfind
     // find_first_of
@@ -282,6 +282,16 @@ private:
     friend string operator+(const char *lhs, const string &rhs);
     friend string operator+(const string &lhs, char rhs);
     friend string operator+(char lhs, const string &rhs);
+
+    friend string to_string(int val);
+    friend string to_string(long val);
+    friend string to_string(long long val);
+    friend string to_string(unsigned val);
+    friend string to_string(unsigned long val);
+    friend string to_string(unsigned long long val);
+    friend string to_string(float val);
+    friend string to_string(double val);
+    friend string to_string(void *val);
 };
 
 string operator+ (const string& lhs, const string& rhs);

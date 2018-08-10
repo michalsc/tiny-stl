@@ -48,5 +48,8 @@ int main(int argc, char **argv)
         printf("%c ", *it);
     printf("\n");
 
+    t_std::string sx = t_std::to_string(((unsigned long long)0xffffffffffffffffULL));
+    printf("'%s'\n", sx.c_str());
+
     return 0;
 }
