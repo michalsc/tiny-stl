@@ -1,5 +1,6 @@
 // 
 
+#include <stdio.h>
 #include <iterator>
 #include "support.h"
 
@@ -31,16 +32,29 @@ public:
     explicit list(size_type n, const value_type& val = value_type()) : list() { while(n--) push_front(val); }
 
     void push_front(const value_type& val) {
-        node<value_type> *n = AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
-        new(&n) node<value_type>(val);
+        node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
+        new(n) node<value_type>(val);
         ADDHEAD(&_list, n);
         count++;
     }
 
+    void push_back(const value_type& val) {
+        node<value_type> *n = AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
+        new(&n) node<value_type>(val);
+        ADDTAIL(&_list, n);
+        count++;
+    }
+
     void pop_front() {
-        if (count > 0)
-        {
+        if (count > 0) {
             REMHEAD(&_list);
+            count--;
+        }
+    }
+
+    void pop_back() {
+        if (count > 0) {
+            REMTAIL(&_list);
             count--;
         }
     }

@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    t_std::list<int> list;
+    t_std::list<int> list(100, 0);
 
     list.clear();
 
