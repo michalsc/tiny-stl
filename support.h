@@ -124,4 +124,12 @@ static inline MinNode * REMTAIL(struct MinList *_l)
     return l->mlh_TailPred->mln_Pred ? REMOVE(l->mlh_TailPred) : (struct MinNode *)0;
 }
 
+#define ForeachNode(list, node)                        \
+for                                                    \
+(                                                      \
+    node = (void *)(((struct MinList *)(list))->mlh_Head); \
+    ((struct MinNode *)(node))->mln_Succ;                  \
+    node = (void *)(((struct MinNode *)(node))->mln_Succ)  \
+)
+
 #endif // _SUPPORT_H

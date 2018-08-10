@@ -12,8 +12,12 @@ int main(int argc, char **argv)
     (void)argv;
 
     t_std::list<int> list(100, 0);
+    t_std::list<t_std::string> list2;
+    
 
     list.clear();
+    printf("%ld\n", list.max_size());
+    printf("%ld\n", list2.max_size());
 
     t_std::string str = "Hello";
     t_std::string s0("Initial string");

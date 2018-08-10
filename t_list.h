@@ -26,11 +26,28 @@ public:
     typedef const value_type&   const_reference;
     typedef value_type*         pointer;
     typedef const value_type*   const_pointer;
-    typedef unsigned int        size_type;
+    typedef intptr_t            size_type;
 
+    // Constructors
     explicit list() : count(0) { NEWLIST(&_list); }
     explicit list(size_type n, const value_type& val = value_type()) : list() { while(n--) push_front(val); }
+    ~list() { clear(); }
+    list& operator= (const list& x) { clear(); node<value_type> *n; ForeachNode(&x._list, n) push_back(n->value); return *this; }
+    
+    // Iterators
 
+    // Capacity
+    size_type size() { return count; }
+    bool empty() { return 0 == count; }
+    size_type max_size() { return (uintptr_t)-1 / sizeof(node<value_type>); }
+
+    // Element access
+    reference front() { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
+    const_reference front() const { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
+    reference tail() { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
+    const_reference tail() const { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
+
+    // Modifiers
     void push_front(const value_type& val) {
         node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
         new(n) node<value_type>(val);
@@ -58,9 +75,6 @@ public:
             count--;
         }
     }
-
-    size_type size() { return count; }
-    bool empty() { return 0 == count; }
 
     void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { n->~node<value_type>(); FreeMem(n, sizeof(node<value_type>)); }; count = 0; }
 
