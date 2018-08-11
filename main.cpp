@@ -11,11 +11,22 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    t_std::list<int> list(100, 0);
+    t_std::list<int> list(10, 0);
     t_std::list<t_std::string> list2;
     
+    list.test();
+    list.push_front(10);
+    list.test();
+    list.push_back(20);
+    list.test();
 
+    for (auto it=list.begin(); it != list.end(); ++it)
+    {
+        printf("%d ", *it);
+    }
+    printf("\n");
     list.clear();
+
     printf("%ld\n", list.max_size());
     printf("%ld\n", list2.max_size());
 

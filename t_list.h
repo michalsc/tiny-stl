@@ -28,6 +28,47 @@ public:
     typedef const value_type*   const_pointer;
     typedef intptr_t            size_type;
 
+    class const_iterator;
+    // Bidirectional iterator for list
+    class iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        node<value_type> *n;
+
+      public:
+        iterator() : n(nullptr){};
+        iterator(node<value_type> *node) : n(node){};
+        iterator(const iterator &it) : n(it.n){};
+        value_type& operator*() const { return n->value; }
+
+        iterator &operator++()
+        {
+            n = (node<value_type> *)(n->mn.mln_Succ);
+            return *this;
+        }
+        iterator &operator--()
+        {
+            n = (node<value_type> *)(n->mn.mln_Pred);
+            return *this;
+        }
+        iterator operator++(int)
+        {
+            iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        iterator operator--(int)
+        {
+            iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const iterator &rhs) const { return n != rhs.n; }
+
+        friend class string::const_iterator;
+    };
+
     // Constructors
     explicit list() : count(0) { NEWLIST(&_list); }
     explicit list(size_type n, const value_type& val = value_type()) : list() { while(n--) push_front(val); }
@@ -35,6 +76,8 @@ public:
     list& operator= (const list& x) { clear(); node<value_type> *n; ForeachNode(&x._list, n) push_back(n->value); return *this; }
     
     // Iterators
+    iterator begin() { if(count > 0) return iterator((node<value_type> *)_list.mlh_Head); else return end(); }
+    iterator end() { return iterator((node<value_type> *)&_list.mlh_Tail); }
 
     // Capacity
     size_type size() { return count; }
@@ -63,8 +106,8 @@ public:
         }
     }
     void push_back(const value_type& val) {
-        node<value_type> *n = AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
-        new(&n) node<value_type>(val);
+        node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
+        new(n) node<value_type>(val);
         ADDTAIL(&_list, n); count++;
     }
     void pop_back() {
@@ -120,6 +163,14 @@ public:
     }
     // sort
     // reverse
+    void test() {
+        node<value_type> *n = (node<value_type> *)GetHead(&_list);
+        printf("list=%p, list->head=%p, list->tail=%p, list->tailpred=%p\n",
+               (void *)&_list, (void *)(_list.mlh_Head), (void *)(_list.mlh_Tail), (void *)(_list.mlh_TailPred));
+        printf("HEAD @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->mn.mln_Succ), (void *)(n->mn.mln_Pred));
+        n = (node<value_type> *)GetTail(&_list);
+        printf("TAIL @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->mn.mln_Succ), (void *)(n->mn.mln_Pred));
+    }
 private:
     MinList             _list;
     size_type           count;
