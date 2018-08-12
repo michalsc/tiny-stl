@@ -69,6 +69,81 @@ public:
         friend class string::const_iterator;
     };
 
+    class const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        const node<value_type> *n;
+
+      public:
+        const_iterator() : n(nullptr){};
+        const_iterator(node<value_type> *node) : n(node){};
+        const_iterator(const const_iterator &it) : n(it.n){};
+        const_iterator(const list<value_type>::iterator &it) : n(it.n) {};
+        value_type &operator*() const { return n->value; }
+
+        const_iterator &operator++()
+        {
+            n = (node<value_type> *)(n->mn.mln_Succ);
+            return *this;
+        }
+        const_iterator &operator--()
+        {
+            n = (node<value_type> *)(n->mn.mln_Pred);
+            return *this;
+        }
+        const_iterator operator++(int)
+        {
+            const_iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        const_iterator operator--(int)
+        {
+            const_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const const_iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const const_iterator &rhs) const { return n != rhs.n; }
+    };
+
+    class reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        node<value_type> *n;
+
+      public:
+        reverse_iterator() : n(nullptr){};
+        reverse_iterator(node<value_type> *node) : n(node){};
+        reverse_iterator(const reverse_iterator &it) : n(it.n){};
+        value_type &operator*() const { return n->value; }
+
+        reverse_iterator &operator++()
+        {
+            n = (node<value_type> *)(n->mn.mln_Pred);
+            return *this;
+        }
+        reverse_iterator &operator--()
+        {
+            n = (node<value_type> *)(n->mn.mln_Succ);
+            return *this;
+        }
+        reverse_iterator operator++(int)
+        {
+            reverse_iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        reverse_iterator operator--(int)
+        {
+            reverse_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const reverse_iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const reverse_iterator &rhs) const { return n != rhs.n; }
+    };
+
     // Constructors
     explicit list() : count(0) { NEWLIST(&_list); }
     explicit list(size_type n, const value_type& val = value_type()) : list() { while(n--) push_front(val); }
@@ -78,6 +153,8 @@ public:
     // Iterators
     iterator begin() { if(count > 0) return iterator((node<value_type> *)_list.mlh_Head); else return end(); }
     iterator end() { return iterator((node<value_type> *)&_list.mlh_Tail); }
+    reverse_iterator rbegin() { if(count > 0) return reverse_iterator((node<value_type> *)_list.mlh_TailPred); else return rend(); }
+    reverse_iterator rend() { return reverse_iterator((node<value_type> *)&_list.mlh_Head); }
 
     // Capacity
     size_type size() { return count; }
@@ -91,8 +168,12 @@ public:
     const_reference tail() const { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
 
     // Modifiers
-    //template <class InputIterator>
-    //void assign(InputIterator first, InputIterator last);
+    template <class InputIterator>
+    void assign(InputIterator first, InputIterator last) {
+        clear(); for (auto it=first; it != last; ++it) {
+            push_back(*it);
+        }
+    }
     void assign(size_type n, const value_type &val) { clear(); while(n--) push_front(val); }
     void push_front(const value_type& val) {
         node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);

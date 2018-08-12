@@ -25,6 +25,12 @@ int main(int argc, char **argv)
         printf("%d ", *it);
     }
     printf("\n");
+
+    for (auto it = list.rbegin(); it != list.rend(); ++it)
+    {
+        printf("%d ", *it);
+    }
+    printf("\n");
     list.clear();
 
     printf("%ld\n", list.max_size());
