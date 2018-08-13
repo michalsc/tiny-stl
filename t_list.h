@@ -39,7 +39,7 @@ public:
     {
         node<value_type> *n;
 
-      public:
+    public:
         iterator() : n(nullptr){};
         iterator(node<value_type> *node) : n(node){};
         iterator(const iterator &it) : n(it.n){};
@@ -74,6 +74,7 @@ public:
         bool operator!=(const iterator &rhs) const { return n != rhs.n; }
 
         friend class list::const_iterator;
+        friend class list;
     };
 
     class const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
@@ -114,6 +115,8 @@ public:
 
         bool operator==(const const_iterator &rhs) const { return n == rhs.n; }
         bool operator!=(const const_iterator &rhs) const { return n != rhs.n; }
+
+        friend class list;
     };
 
     class reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
@@ -153,6 +156,8 @@ public:
 
         bool operator==(const reverse_iterator &rhs) const { return n == rhs.n; }
         bool operator!=(const reverse_iterator &rhs) const { return n != rhs.n; }
+
+        friend class list;
     };
 
     // Constructors
@@ -163,7 +168,7 @@ public:
     list(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : list(alloc) { for (auto it=first; it != last; ++it) push_back(*it); }
     ~list() { clear(); }
     list(const list& x) : count(0) { NEWLIST(&_list); alloc = allocator_type(x.alloc); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } }
-    list& operator= (const list& x) { clear(); node<value_type> *n; ForeachNode(&x._list, n) push_back(n->value); return *this; }
+    list& operator= (const list& x) { clear(); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } return *this; }
     
     // Iterators
     iterator begin() { if(count > 0) return iterator((node<value_type> *)_list.mlh_Head); else return end(); }
@@ -216,7 +221,72 @@ public:
             count--;
         }
     }
-    // insert
+    iterator insert(iterator position, const value_type& val) {
+        node<value_type> *n = alloc.allocate(1);
+        alloc.construct(n, node<value_type>(val));
+        
+        n->mn.mln_Succ = position.n->mn.mln_Succ;
+        n->mn.mln_Pred = (struct MinNode *)position.n;
+
+        n->mn.mln_Succ->mln_Pred = (struct MinNode *)n;
+        n->mn.mln_Pred->mln_Succ = (struct MinNode *)n;
+        
+        count++;
+
+        return iterator(n);
+    }
+    void insert(iterator position, int n, const value_type& val) {
+        insert(position, (size_type)n, val);
+    }
+    void insert(iterator position, size_type n, const value_type& val) {
+        if (n > 0)
+        {
+            MinList l;
+            NEWLIST(&l);
+
+            count += n;
+
+            while(n--)
+            {
+                node<value_type> *no = alloc.allocate(1);
+                alloc.construct(no, node<value_type>(val));
+                ADDTAIL(&l, (MinNode *)no);
+            }
+
+            node<value_type> *first = (node<value_type> *)GetHead(&l);
+            node<value_type> *last = (node<value_type> *)GetTail(&l);
+
+            first->mn.mln_Pred = (struct MinNode *)position.n;
+            last->mn.mln_Succ = position.n->mn.mln_Succ;
+
+            first->mn.mln_Pred->mln_Succ = (struct MinNode *)first;
+            last->mn.mln_Succ->mln_Pred = (struct MinNode *)last;
+        }
+    }
+    template <class InputIterator>
+    void insert (iterator position, InputIterator first, InputIterator last) {
+        MinList l;
+        NEWLIST(&l);
+
+        for (auto it=first; it != last; ++it)
+        {
+            node<value_type> *no = alloc.allocate(1);
+            alloc.construct(no, node<value_type>(*it));
+            ADDTAIL(&l, (MinNode *)no);
+            count++;
+        }
+
+        node<value_type> *fi = (node<value_type> *)GetHead(&l);
+        node<value_type> *la = (node<value_type> *)GetTail(&l);
+        if (fi)
+        {
+            fi->mn.mln_Pred = (struct MinNode *)position.n;
+            la->mn.mln_Succ = position.n->mn.mln_Succ;
+
+            fi->mn.mln_Pred->mln_Succ = (struct MinNode *)fi;
+            la->mn.mln_Succ->mln_Pred = (struct MinNode *)la;
+        }
+    }
     // erase
     void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; MinList ml = _list; _list = x._list; x._list = ml; }
     void resize(size_type n, value_type val = value_type()) {
@@ -286,7 +356,6 @@ private:
     MinList             _list;
     size_type           count;
     allocator_type      alloc;
-
 };
 
 }

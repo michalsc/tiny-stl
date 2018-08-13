@@ -42,4 +42,54 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         CHECK( second.size() == 3);
     }
 
+    SECTION("Iterators") {
+        int myints[] = {75,23,65,42,13};
+        t_std::list<int> mylist (myints,myints+5);
+        
+        int i=0;
+        for (t_std::list<int>::iterator it = mylist.begin(); it != mylist.end(); ++it)
+        {
+            CHECK( myints[i++] == *it );
+        }
+
+        i=4;
+        for (t_std::list<int>::reverse_iterator it = mylist.rbegin(); it != mylist.rend(); ++it)
+        {
+            CHECK( myints[i--] == *it );
+        }
+    }
+
+    SECTION("Capacity") {
+        {
+            t_std::list<int> mylist;
+            int sum (0);
+
+            for (int i=1;i<=10;++i) mylist.push_back(i);
+
+            while (!mylist.empty())
+            {
+                sum += mylist.front();
+                mylist.pop_front();
+            }
+
+            CHECK( sum == 55 );
+        }
+
+        {
+            t_std::list<int> myints;
+            CHECK( myints.size() == 0 );
+
+            for (int i=0; i<10; i++) myints.push_back(i);
+            CHECK( myints.size() == 10 );
+
+            myints.insert(myints.begin(), 1);
+            CHECK( myints.size() == 11 );
+
+            myints.insert(myints.begin(),10,100);
+            CHECK( myints.size() == 21 );
+
+            myints.pop_back();
+            CHECK( myints.size() == 20 );
+        }
+    }
 }
