@@ -1,8 +1,12 @@
 // 
+#ifndef _T_LIST_H
+#define _T_LIST_H
 
 #include <stdio.h>
 #include <iterator>
 #include "support.h"
+
+#include "t_allocator.h"
 
 namespace t_std {
 
@@ -18,15 +22,16 @@ namespace {
 
 }
 
-template <class T>
+template < class T, class Alloc = allocator<T> >
 class list {
 public:
-    typedef T                   value_type;
-    typedef value_type&         reference;
-    typedef const value_type&   const_reference;
-    typedef value_type*         pointer;
-    typedef const value_type*   const_pointer;
-    typedef intptr_t            size_type;
+    typedef T                       value_type;
+    typedef value_type&             reference;
+    typedef const value_type&       const_reference;
+    typedef value_type*             pointer;
+    typedef const value_type*       const_pointer;
+    typedef intptr_t                size_type;
+    typedef allocator<node<value_type> >            allocator_type;
 
     class const_iterator;
     // Bidirectional iterator for list
@@ -42,12 +47,14 @@ public:
 
         iterator &operator++()
         {
-            n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->mn.mln_Succ)
+                n = (node<value_type> *)(n->mn.mln_Succ);
             return *this;
         }
         iterator &operator--()
         {
-            n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->mn.mln_Pred)
+                n = (node<value_type> *)(n->mn.mln_Pred);
             return *this;
         }
         iterator operator++(int)
@@ -77,17 +84,19 @@ public:
         const_iterator() : n(nullptr){};
         const_iterator(node<value_type> *node) : n(node){};
         const_iterator(const const_iterator &it) : n(it.n){};
-        const_iterator(const list<value_type>::iterator &it) : n(it.n) {};
+        const_iterator(const typename list<value_type>::iterator &it) : n(it.n) {};
         value_type &operator*() const { return n->value; }
 
         const_iterator &operator++()
         {
-            n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->mn.mln_Succ)
+                n = (node<value_type> *)(n->mn.mln_Succ);
             return *this;
         }
         const_iterator &operator--()
         {
-            n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->mn.mln_Pred)
+                n = (node<value_type> *)(n->mn.mln_Pred);
             return *this;
         }
         const_iterator operator++(int)
@@ -119,12 +128,14 @@ public:
 
         reverse_iterator &operator++()
         {
-            n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->mn.mln_Pred)
+                n = (node<value_type> *)(n->mn.mln_Pred);
             return *this;
         }
         reverse_iterator &operator--()
         {
-            n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->mn.mln_Succ)
+                n = (node<value_type> *)(n->mn.mln_Succ);
             return *this;
         }
         reverse_iterator operator++(int)
@@ -145,8 +156,8 @@ public:
     };
 
     // Constructors
-    explicit list() : count(0) { NEWLIST(&_list); }
-    explicit list(size_type n, const value_type& val = value_type()) : list() { while(n--) push_front(val); }
+    explicit list(const allocator_type& alloc = allocator_type()) : count(0), alloc(alloc) { NEWLIST(&_list); }
+    explicit list(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : list(alloc) { while(n--) push_front(val); }
     ~list() { clear(); }
     list& operator= (const list& x) { clear(); node<value_type> *n; ForeachNode(&x._list, n) push_back(n->value); return *this; }
     
@@ -176,28 +187,28 @@ public:
     }
     void assign(size_type n, const value_type &val) { clear(); while(n--) push_front(val); }
     void push_front(const value_type& val) {
-        node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
-        new(n) node<value_type>(val);
+        node<value_type> *n = alloc.allocate(1);
+        alloc.construct(n, node<value_type>(val));
         ADDHEAD(&_list, n); count++;
     }
     void pop_front() {
         if (count > 0) {
             node<value_type> *n = (node<value_type> *)REMHEAD(&_list);
-            n->~node<value_type>();
-            FreeMem(n, sizeof(node<value_type>));
+            alloc.destroy(n);
+            alloc.deallocate(n, 1);
             count--;
         }
     }
     void push_back(const value_type& val) {
-        node<value_type> *n = (node<value_type> *)AllocMem(sizeof(node<value_type>), MEMF_CLEAR);
-        new(n) node<value_type>(val);
+        node<value_type> *n = alloc.allocate(1);
+        alloc.construct(n, val);
         ADDTAIL(&_list, n); count++;
     }
     void pop_back() {
         if (count > 0) {
             node<value_type> *n = (node<value_type> *)REMTAIL(&_list);
-            n->~node<value_type>();
-            FreeMem(n, sizeof(node<value_type>));
+            alloc.destroy(n);
+            alloc.deallocate(n, 1);
             count--;
         }
     }
@@ -215,7 +226,7 @@ public:
                 pop_back();
         }
     }
-    void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { n->~node<value_type>(); FreeMem(n, sizeof(node<value_type>)); }; count = 0; }
+    void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { alloc.destroy(n); alloc.deallocate(n, 1); }; count = 0; }
 
     // Operations
     // splice
@@ -224,8 +235,8 @@ public:
         ForeachNodeSafe(&_list, n, next) {
             if (n->value == val) {
                 REMOVE(n);
-                n->~node<value_type>();
-                FreeMem(n, sizeof(node<value_type>));
+                alloc.destroy(n);
+                alloc.deallocate(n, 1);
                 count--;
             }
         }
@@ -241,8 +252,8 @@ public:
                 if (n1->value == n->value) {
                     REMOVE(n1);
                     count--;
-                    n1->~node<value_type>();
-                    FreeMem(n1, sizeof(node<value_type>));
+                    alloc.destroy(n1);
+                    alloc.deallocate(n1, 1);
                 }
                 n1 = next;
             }
@@ -270,8 +281,10 @@ public:
 private:
     MinList             _list;
     size_type           count;
-
+    allocator_type      alloc;
 
 };
 
 }
+
+#endif // _T_LIST_H
