@@ -182,7 +182,9 @@ public:
     }
     void pop_front() {
         if (count > 0) {
-            REMHEAD(&_list);
+            node<value_type> *n = (node<value_type> *)REMHEAD(&_list);
+            n->~node<value_type>();
+            FreeMem(n, sizeof(node<value_type>));
             count--;
         }
     }
@@ -193,14 +195,26 @@ public:
     }
     void pop_back() {
         if (count > 0) {
-            REMTAIL(&_list);
+            node<value_type> *n = (node<value_type> *)REMTAIL(&_list);
+            n->~node<value_type>();
+            FreeMem(n, sizeof(node<value_type>));
             count--;
         }
     }
     // insert
     // erase
     void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; MinList ml = _list; _list = x._list; x._list = ml; }
-    // resize
+    void resize(size_type n, value_type val = value_type()) {
+        if (count < n) {
+            int cnt = n - count;
+            while(cnt--)
+                push_back(val);
+        } else {
+            int cnt = count - n;
+            while(cnt--)
+                pop_back();
+        }
+    }
     void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { n->~node<value_type>(); FreeMem(n, sizeof(node<value_type>)); }; count = 0; }
 
     // Operations
@@ -212,6 +226,7 @@ public:
                 REMOVE(n);
                 n->~node<value_type>();
                 FreeMem(n, sizeof(node<value_type>));
+                count--;
             }
         }
     }
