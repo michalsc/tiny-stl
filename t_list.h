@@ -73,7 +73,7 @@ public:
         bool operator==(const iterator &rhs) const { return n == rhs.n; }
         bool operator!=(const iterator &rhs) const { return n != rhs.n; }
 
-        friend class string::const_iterator;
+        friend class list::const_iterator;
     };
 
     class const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
@@ -158,7 +158,11 @@ public:
     // Constructors
     explicit list(const allocator_type& alloc = allocator_type()) : count(0), alloc(alloc) { NEWLIST(&_list); }
     explicit list(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : list(alloc) { while(n--) push_front(val); }
+    explicit list(int n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : list((size_type)n, val, alloc) {}
+    template <class InputIterator>
+    list(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : list(alloc) { for (auto it=first; it != last; ++it) push_back(*it); }
     ~list() { clear(); }
+    list(const list& x) : count(0) { NEWLIST(&_list); alloc = allocator_type(x.alloc); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } }
     list& operator= (const list& x) { clear(); node<value_type> *n; ForeachNode(&x._list, n) push_back(n->value); return *this; }
     
     // Iterators

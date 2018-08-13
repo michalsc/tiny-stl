@@ -23,7 +23,8 @@ public:
 
     allocator() : construct_count(0), deconstruct_count(0), allocate_count(0), deallocate_count(0) { printf("Allocator @ %p for type %s\n", (void*)this, typeid(T).name()); };
     allocator(const allocator&) : allocator() {};
-    ~allocator() { printf("Destroying allocator @ %p for type %s\n", (void*)this, typeid(T).name()); printf("Constructed: %d, Deconstructed: %d\nAllocated: %d, Deallocated: %d\n", construct_count, deconstruct_count, allocate_count, deallocate_count); }
+    ~allocator() { printf("Destroying allocator @ %p for type %s\n", (void*)this, typeid(T).name()); 
+        if (construct_count != deconstruct_count || allocate_count != deallocate_count) ("Constructed: %d, Deconstructed: %d\nAllocated: %d, Deallocated: %d\n", construct_count, deconstruct_count, allocate_count, deallocate_count); }
     pointer address(reference x) { return &x; }
     const_pointer address(const_reference x) { return &x; }
     pointer allocate(size_type n) { pointer p = (pointer)AllocMem(n * sizeof(value_type), MEMF_CLEAR); printf("t_std::allocate(%p, %d)=%p\n", (void*)this, (int)n, (void*)p); allocate_count++; return p; }

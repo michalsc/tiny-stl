@@ -22,6 +22,12 @@
         "__nullptr": "cpp",
         "algorithm": "cpp",
         "type_traits": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "sstream": "cpp",
+        "__functional_base": "cpp",
+        "atomic": "cpp",
+        "limits": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp"
     }
 }
