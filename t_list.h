@@ -184,8 +184,8 @@ public:
     // Element access
     reference front() { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
     const_reference front() const { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
-    reference tail() { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
-    const_reference tail() const { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
+    reference back() { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
+    const_reference back() const { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
 
     // Modifiers
     template <class InputIterator>
@@ -287,7 +287,23 @@ public:
             la->mn.mln_Succ->mln_Pred = (struct MinNode *)la;
         }
     }
-    // erase
+    iterator erase(iterator position) {
+        node<value_type> *n = position.n;
+        iterator it(n->mn.mln_Succ);
+        REMOVE((MinNode *)n);
+        alloc.destroy(n);
+        alloc.deallocate(n, 1);
+        count--;
+        return it;
+    }
+    iterator erase(iterator first, iterator last) {
+       /* node<value_type> *n = position.n;
+        iterator it(n->mn.mln_Succ);
+        REMOVE((MinNode *)n);
+        alloc.destroy(n);
+        alloc.deallocate(n, 1);
+        count--;*/
+    }
     void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; MinList ml = _list; _list = x._list; x._list = ml; }
     void resize(size_type n, value_type val = value_type()) {
         if (count < n) {

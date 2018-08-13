@@ -92,4 +92,39 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
             CHECK( myints.size() == 20 );
         }
     }
+
+    SECTION("Element access") {
+        {
+            t_std::list<int> mylist;
+
+            mylist.push_back(77);
+            mylist.push_back(22);
+
+            // now front equals 77, and back 22
+
+            mylist.front() -= mylist.back();
+
+            CHECK( mylist.front() == 55 );
+        }
+
+        {
+            t_std::list<int> mylist;
+
+            mylist.push_back(10);
+
+            while (mylist.back() != 0)
+            {
+                mylist.push_back ( mylist.back() -1 );
+            }
+
+            auto it = mylist.begin();
+            for (int i=10; i >= 0; ++it, i--)
+            {
+                CHECK( *it == i );
+            }
+        }
+    }
+
+
+
 }
