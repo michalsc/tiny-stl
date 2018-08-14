@@ -171,9 +171,9 @@ public:
     list& operator= (const list& x) { clear(); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } return *this; }
     
     // Iterators
-    iterator begin() { if(count > 0) return iterator((node<value_type> *)_list.mlh_Head); else return end(); }
+    iterator begin() { return iterator((node<value_type> *)_list.mlh_Head); }
     iterator end() { return iterator((node<value_type> *)&_list.mlh_Tail); }
-    reverse_iterator rbegin() { if(count > 0) return reverse_iterator((node<value_type> *)_list.mlh_TailPred); else return rend(); }
+    reverse_iterator rbegin() { return reverse_iterator((node<value_type> *)_list.mlh_TailPred); }
     reverse_iterator rend() { return reverse_iterator((node<value_type> *)&_list.mlh_Head); }
 
     // Capacity
@@ -332,8 +332,8 @@ public:
         node<value_type> *last = (node<value_type> *)GetTail(&x._list);
         if (first)
         {
-            first->mn.mln_Pred = (struct MinNode *)position.n;
-            last->mn.mln_Succ = position.n->mn.mln_Succ;
+            first->mn.mln_Pred = position.n->mn.mln_Pred;
+            last->mn.mln_Succ = (struct MinNode *)position.n;
 
             first->mn.mln_Pred->mln_Succ = (struct MinNode *)first;
             last->mn.mln_Succ->mln_Pred = (struct MinNode *)last;
@@ -344,10 +344,49 @@ public:
         }
     }
     void splice (iterator position, list& x, iterator i) {
+        if (i != x.end())
+        {
+            node<value_type> *n = i.n;
+            REMOVE((MinNode *)n);
+            x.count--;
 
+            n->mn.mln_Pred = position.n->mn.mln_Pred;
+            n->mn.mln_Succ = (struct MinNode *)position.n;
+
+            n->mn.mln_Succ->mln_Pred = (struct MinNode *)n;
+            n->mn.mln_Pred->mln_Succ = (struct MinNode *)n;
+
+            count++;
+        }
     }
     void splice (iterator position, list& x, iterator first, iterator last) {
+        MinList l;
+        NEWLIST(&l);
+        iterator it(first);
+        while (it != last)
+        {
+            node<value_type> *no = it.n;
+            ++it;
+            REMOVE((MinNode *)no);
+            x.count--;
+            ADDTAIL(&l, (MinNode *)no);
+            count++;
+        }
 
+        //printf("splice: list @ %p, Head: %p, Tail: %p, TailPred: %p\n", (void*)&l, (void*)l.mlh_Head, (void*)l.mlh_Tail, (void*)l.mlh_TailPred);
+
+        node<value_type> *fi = (node<value_type> *)GetHead(&l);
+        node<value_type> *la = (node<value_type> *)GetTail(&l);
+
+        printf("first: %p, last: %p\n", (void*)fi, (void*)la);
+        if (fi)
+        {
+            fi->mn.mln_Pred = position.n->mn.mln_Pred;
+            la->mn.mln_Succ = (struct MinNode *)position.n;
+
+            fi->mn.mln_Pred->mln_Succ = (struct MinNode *)fi;
+            la->mn.mln_Succ->mln_Pred = (struct MinNode *)la;
+        }
     }
     void remove(const value_type& val) {
         node<value_type> *n, *next;

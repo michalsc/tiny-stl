@@ -1,4 +1,5 @@
 #include "t_list.h"
+#include "t_string.h"
 #include "catch.hpp"
 
 TEST_CASE("t_std::list class", "[t_std::list]") {
@@ -181,21 +182,37 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
                                             // mylist1: 1 10 20 30 3 4
                                             // mylist2: 2
                                             // "it" is now invalid.
+#if 1
             it = mylist1.begin();
             std::advance(it,3);           // "it" points now to 30
 
             mylist1.splice ( mylist1.begin(), mylist1, it, mylist1.end());
                                             // mylist1: 30 3 4 1 10 20
+#endif
+            int test_list_1[] = { 30, 3, 4, 1, 10, 20 };
+            int test_list_2[] = { 2 };
+            int i = 0;
 
-            std::cout << "mylist1 contains:";
-            for (it=mylist1.begin(); it!=mylist1.end(); ++it)
-                std::cout << ' ' << *it;
-            std::cout << '\n';
+            t_std::string str = "";
+            for (it=mylist1.begin(); it!=mylist1.end(); ++it) {
+                str += t_std::to_string(*it);
+                str += " ";
+            }
+            INFO( "list1: " << str.c_str() << " count: " << mylist1.size());
+            for (it=mylist1.begin(); it!=mylist1.end(); ++it, ++i) {
+                CHECK( test_list_1[i] == *it );
+            }
 
-            std::cout << "mylist2 contains:";
-            for (it=mylist2.begin(); it!=mylist2.end(); ++it)
-                std::cout << ' ' << *it;
-            std::cout << '\n';
+            str = "";
+            for (it=mylist2.begin(); it!=mylist2.end(); ++it) {
+                str += t_std::to_string(*it);
+                str += " ";
+            }
+            INFO( "list2: " << str.c_str() << " count: " << mylist2.size());
+            i = 0;
+            for (it=mylist2.begin(); it!=mylist2.end(); ++it, ++i) {
+                CHECK( test_list_2[i] == *it );
+            }
         }
     }
 
