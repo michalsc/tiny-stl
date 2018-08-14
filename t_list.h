@@ -327,7 +327,28 @@ public:
     void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { alloc.destroy(n); alloc.deallocate(n, 1); }; count = 0; }
 
     // Operations
-    // splice
+    void splice(iterator position, list& x) {
+        node<value_type> *first = (node<value_type> *)GetHead(&x._list);
+        node<value_type> *last = (node<value_type> *)GetTail(&x._list);
+        if (first)
+        {
+            first->mn.mln_Pred = (struct MinNode *)position.n;
+            last->mn.mln_Succ = position.n->mn.mln_Succ;
+
+            first->mn.mln_Pred->mln_Succ = (struct MinNode *)first;
+            last->mn.mln_Succ->mln_Pred = (struct MinNode *)last;
+
+            NEWLIST(&x._list);
+            count += x.count;
+            x.count = 0;
+        }
+    }
+    void splice (iterator position, list& x, iterator i) {
+
+    }
+    void splice (iterator position, list& x, iterator first, iterator last) {
+
+    }
     void remove(const value_type& val) {
         node<value_type> *n, *next;
         ForeachNodeSafe(&_list, n, next) {
