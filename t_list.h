@@ -289,20 +289,28 @@ public:
     }
     iterator erase(iterator position) {
         node<value_type> *n = position.n;
-        iterator it(n->mn.mln_Succ);
-        REMOVE((MinNode *)n);
-        alloc.destroy(n);
-        alloc.deallocate(n, 1);
-        count--;
-        return it;
+        if (n->mn.mln_Succ)
+        {
+            iterator it((node<value_type> *)(n->mn.mln_Succ));
+            REMOVE((MinNode *)n);
+            alloc.destroy(n);
+            alloc.deallocate(n, 1);
+            count--;
+            return it;
+        }
+        else return position;
     }
     iterator erase(iterator first, iterator last) {
-       /* node<value_type> *n = position.n;
-        iterator it(n->mn.mln_Succ);
-        REMOVE((MinNode *)n);
-        alloc.destroy(n);
-        alloc.deallocate(n, 1);
-        count--;*/
+        iterator it(first);
+        while(it != last) {
+            node<value_type> *n = it.n;
+            ++it;
+            REMOVE((MinNode *)n);
+            alloc.destroy(n);
+            alloc.deallocate(n, 1);
+            count--;
+        }
+        return last;
     }
     void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; MinList ml = _list; _list = x._list; x._list = ml; }
     void resize(size_type n, value_type val = value_type()) {

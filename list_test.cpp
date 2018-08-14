@@ -123,6 +123,39 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
                 CHECK( *it == i );
             }
         }
+
+        {
+            t_std::list<int> mylist;
+            t_std::list<int>::iterator it1,it2;
+
+            // set some values:
+            for (int i=1; i<10; ++i) mylist.push_back(i*10);
+
+                                        // 10 20 30 40 50 60 70 80 90
+            it1 = it2 = mylist.begin(); // ^^
+            advance (it2,6);            // ^                 ^
+            ++it1;                      //    ^              ^
+
+            it1 = mylist.erase (it1);   // 10 30 40 50 60 70 80 90
+                                        //    ^           ^
+
+            it2 = mylist.erase (it2);   // 10 30 40 50 60 80 90
+                                        //    ^           ^
+
+            ++it1;                      //       ^        ^
+            --it2;                      //       ^     ^
+
+            mylist.erase (it1,it2);     // 10 30 60 80 90
+                                        //
+
+            int test_array[] = { 10, 30, 60, 80, 90 };
+            int i=0;
+
+            for (auto it=mylist.begin(); it != mylist.end(); ++it, ++i)
+            {
+                CHECK( *it == test_array[i] );
+            }
+        }
     }
 
 
