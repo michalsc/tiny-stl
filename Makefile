@@ -1,4 +1,5 @@
-CXX := /usr/bin/clang++
+#CXX := /usr/bin/clang++
+CXX ?= /usr/local/bin/g++-8
 CXXFLAGS:= -std=c++0x -Os -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0 
 LDFLAGS := 
 
