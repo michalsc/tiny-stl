@@ -1,6 +1,6 @@
 #CXX := /usr/bin/clang++
 CXX ?= /usr/local/bin/g++-8
-CXXFLAGS:= -std=c++0x -Os -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0 
+CXXFLAGS:= -std=c++11 -Os -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0 
 LDFLAGS := 
 
 HOST_CXX := /usr/bin/clang++

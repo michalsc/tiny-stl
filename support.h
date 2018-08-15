@@ -11,6 +11,7 @@ void SetMem(void *dst, int size, char fill);
 int _strcmp_(const char *s1, const char *s2);
 int _strlen_(const char *s1);
 
+#if 0
 struct MinNode
 {
     struct MinNode * mln_Succ,
@@ -137,5 +138,6 @@ for                                                    \
         current = (void *)(((struct MinList *)(list))->mlh_Head); \
         (next = (void *)((struct MinNode *)(current))->mln_Succ); \
         current = (void *)next)
+#endif
 
 #endif // _SUPPORT_H

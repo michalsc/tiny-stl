@@ -14,12 +14,31 @@ namespace {
     
     template <class T>
     struct node {
-        MinNode mn;
+        node    *succ;
+        node    *pred;
         T       value;
 
-        node(const T& val) : mn({nullptr, nullptr}), value(val) {}
+        node(const T& val) : succ(nullptr), pred(nullptr), value(val) {}
+        void remove() { pred->succ = succ; succ->pred = pred; }
+        node *getSucc() { if (succ && succ->succ) return succ; else return nullptr; }
+        node *getPred() { if (pred && pred->pred) return pred; else return nullptr; }
     };
 
+    template <class T>
+    struct minlist {
+        node<T> *head;
+        node<T> *tail;
+        node<T> *tailPred;
+
+        minlist() : head((node<T> *)&tail), tail(nullptr), tailPred((node<T> *)&head) { }
+        bool isEmpty() { return tailPred == (node<T> *)&head; }
+        void addHead(node<T> *n) { n->succ = head; n->pred = (node<T> *)&head; head->pred = n; head = n; }
+        void addTail(node<T> *n) { n->succ = (node<T> *)&tail; n->pred = tailPred; tailPred->succ = n; tailPred = n; }
+        node<T> *getHead() const { return head->succ ? head : nullptr; }
+        node<T> *getTail() const { return tailPred->pred ? tailPred : nullptr; }
+        node<T> *remHead() { node<T> *head = getHead(); if (head) head->remove(); return head; }
+        node<T> *remTail() { node<T> *tail = getTail(); if (tail) tail->remove(); return tail; }
+    };
 }
 
 template < class T, class Alloc = allocator<T> >
@@ -47,14 +66,15 @@ public:
 
         iterator &operator++()
         {
-            if (n->mn.mln_Succ)
-                n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->succ)
+                n = n->succ;
+
             return *this;
         }
         iterator &operator--()
         {
-            if (n->mn.mln_Pred)
-                n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->pred)
+                n = n->pred;
             return *this;
         }
         iterator operator++(int)
@@ -90,14 +110,14 @@ public:
 
         const_iterator &operator++()
         {
-            if (n->mn.mln_Succ)
-                n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->succ)
+                n = n->succ;
             return *this;
         }
         const_iterator &operator--()
         {
-            if (n->mn.mln_Pred)
-                n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->pred)
+                n = n->pred;
             return *this;
         }
         const_iterator operator++(int)
@@ -131,14 +151,14 @@ public:
 
         reverse_iterator &operator++()
         {
-            if (n->mn.mln_Pred)
-                n = (node<value_type> *)(n->mn.mln_Pred);
+            if (n->pred)
+                n = n->pred;
             return *this;
         }
         reverse_iterator &operator--()
         {
-            if (n->mn.mln_Succ)
-                n = (node<value_type> *)(n->mn.mln_Succ);
+            if (n->succ)
+                n = n->succ;
             return *this;
         }
         reverse_iterator operator++(int)
@@ -161,20 +181,20 @@ public:
     };
 
     // Constructors
-    explicit list(const allocator_type& alloc = allocator_type()) : count(0), alloc(alloc) { NEWLIST(&_list); }
+    explicit list(const allocator_type& alloc = allocator_type()) : count(0), alloc(alloc) { }
     explicit list(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : list(alloc) { while(n--) push_front(val); }
     explicit list(int n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : list((size_type)n, val, alloc) {}
     template <class InputIterator>
     list(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : list(alloc) { for (auto it=first; it != last; ++it) push_back(*it); }
     ~list() { clear(); }
-    list(const list& x) : count(0) { NEWLIST(&_list); alloc = allocator_type(x.alloc); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } }
-    list& operator= (const list& x) { clear(); void *i; ForeachNode(&x._list, i) { node<value_type> *n = (node<value_type> *)i; push_back(n->value); } return *this; }
+    list(const list& x) : count(0) { alloc = allocator_type(x.alloc); node<value_type> *n = x._list.getHead(); while(n) { push_back(n->value); n = n->getSucc(); } }
+    list& operator= (const list& x) { clear(); node<value_type> *n = x._list.getHead(); while(n) { push_back(n->value); n = n->getSucc(); } return *this; }
     
     // Iterators
-    iterator begin() { return iterator((node<value_type> *)_list.mlh_Head); }
-    iterator end() { return iterator((node<value_type> *)&_list.mlh_Tail); }
-    reverse_iterator rbegin() { return reverse_iterator((node<value_type> *)_list.mlh_TailPred); }
-    reverse_iterator rend() { return reverse_iterator((node<value_type> *)&_list.mlh_Head); }
+    iterator begin() { return iterator(_list.head); }
+    iterator end() { return iterator((node<value_type> *)&_list.tail); }
+    reverse_iterator rbegin() { return reverse_iterator(_list.tailPred); }
+    reverse_iterator rend() { return reverse_iterator((node<value_type> *)&_list.head); }
 
     // Capacity
     size_type size() { return count; }
@@ -182,10 +202,10 @@ public:
     size_type max_size() { return (uintptr_t)-1 / sizeof(node<value_type>); }
 
     // Element access
-    reference front() { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
-    const_reference front() const { node<value_type> *n = (node<value_type> *)GetHead(&_list); return n->value; }
-    reference back() { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
-    const_reference back() const { node<value_type> *n = (node<value_type> *)GetTail(&_list); return n->value; }
+    reference front() { return _list.getHead()->value; }
+    const_reference front() const { return _list.getHead()->value; }
+    reference back() { return _list.getTail()->value; }
+    const_reference back() const { return _list.getTail()->value; }
 
     // Modifiers
     template <class InputIterator>
@@ -198,38 +218,44 @@ public:
     void push_front(const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
         alloc.construct(n, node<value_type>(val));
-        ADDHEAD(&_list, n); count++;
+        _list.addHead(n); count++;
     }
     void pop_front() {
         if (count > 0) {
-            node<value_type> *n = (node<value_type> *)REMHEAD(&_list);
-            alloc.destroy(n);
-            alloc.deallocate(n, 1);
-            count--;
+            node<value_type> *n = _list.remHead();
+            if (n)
+            {
+                alloc.destroy(n);
+                alloc.deallocate(n, 1);
+                count--;
+            }
         }
     }
     void push_back(const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
         alloc.construct(n, val);
-        ADDTAIL(&_list, n); count++;
+        _list.addTail(n); count++;
     }
     void pop_back() {
         if (count > 0) {
-            node<value_type> *n = (node<value_type> *)REMTAIL(&_list);
-            alloc.destroy(n);
-            alloc.deallocate(n, 1);
-            count--;
+            node<value_type> *n = _list.remTail();
+            if (n)
+            {
+                alloc.destroy(n);
+                alloc.deallocate(n, 1);
+                count--;
+            }
         }
     }
     iterator insert(iterator position, const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
         alloc.construct(n, node<value_type>(val));
         
-        n->mn.mln_Succ = position.n->mn.mln_Succ;
-        n->mn.mln_Pred = (struct MinNode *)position.n;
+        n->succ = position.n->succ;
+        n->pred = position.n;
 
-        n->mn.mln_Succ->mln_Pred = (struct MinNode *)n;
-        n->mn.mln_Pred->mln_Succ = (struct MinNode *)n;
+        n->succ->pred = n;
+        n->pred->succ = n;
         
         count++;
 
@@ -241,8 +267,7 @@ public:
     void insert(iterator position, size_type n, const value_type& val) {
         if (n > 0)
         {
-            MinList l;
-            NEWLIST(&l);
+            minlist<value_type> l;
 
             count += n;
 
@@ -250,49 +275,48 @@ public:
             {
                 node<value_type> *no = alloc.allocate(1);
                 alloc.construct(no, node<value_type>(val));
-                ADDTAIL(&l, (MinNode *)no);
+                l.addTail(no);
             }
 
-            node<value_type> *first = (node<value_type> *)GetHead(&l);
-            node<value_type> *last = (node<value_type> *)GetTail(&l);
+            node<value_type> *first = l.getHead();
+            node<value_type> *last = l.getTail();
 
-            first->mn.mln_Pred = (struct MinNode *)position.n;
-            last->mn.mln_Succ = position.n->mn.mln_Succ;
+            first->pred = position.n;
+            last->succ = position.n->succ;
 
-            first->mn.mln_Pred->mln_Succ = (struct MinNode *)first;
-            last->mn.mln_Succ->mln_Pred = (struct MinNode *)last;
+            first->pred->succ = first;
+            last->succ->pred = last;
         }
     }
     template <class InputIterator>
     void insert (iterator position, InputIterator first, InputIterator last) {
-        MinList l;
-        NEWLIST(&l);
+        minlist<value_type> l;
 
         for (auto it=first; it != last; ++it)
         {
             node<value_type> *no = alloc.allocate(1);
             alloc.construct(no, node<value_type>(*it));
-            ADDTAIL(&l, (MinNode *)no);
+            l.addTail(no);
             count++;
         }
 
-        node<value_type> *fi = (node<value_type> *)GetHead(&l);
-        node<value_type> *la = (node<value_type> *)GetTail(&l);
+        node<value_type> *fi = l.getHead();
+        node<value_type> *la = l.getTail();
         if (fi)
         {
-            fi->mn.mln_Pred = (struct MinNode *)position.n;
-            la->mn.mln_Succ = position.n->mn.mln_Succ;
+            fi->pred = position.n;
+            la->succ = position.n->succ;
 
-            fi->mn.mln_Pred->mln_Succ = (struct MinNode *)fi;
-            la->mn.mln_Succ->mln_Pred = (struct MinNode *)la;
+            fi->pred->succ = fi;
+            la->succ->pred = la;
         }
     }
     iterator erase(iterator position) {
         node<value_type> *n = position.n;
-        if (n->mn.mln_Succ)
+        if (n->succ)
         {
-            iterator it((node<value_type> *)(n->mn.mln_Succ));
-            REMOVE((MinNode *)n);
+            iterator it(n->succ);
+            n->remove();
             alloc.destroy(n);
             alloc.deallocate(n, 1);
             count--;
@@ -305,14 +329,14 @@ public:
         while(it != last) {
             node<value_type> *n = it.n;
             ++it;
-            REMOVE((MinNode *)n);
+            n->remove();
             alloc.destroy(n);
             alloc.deallocate(n, 1);
             count--;
         }
         return last;
     }
-    void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; MinList ml = _list; _list = x._list; x._list = ml; }
+    void swap(list& x) { size_type sz = count; count = x.count; x.count = sz; minlist<value_type> ml = _list; _list = x._list; x._list = ml; }
     void resize(size_type n, value_type val = value_type()) {
         if (count < n) {
             int cnt = n - count;
@@ -324,21 +348,21 @@ public:
                 pop_back();
         }
     }
-    void clear() { node<value_type> *n; while((n = (node<value_type> *)REMHEAD(&_list)) != nullptr) { alloc.destroy(n); alloc.deallocate(n, 1); }; count = 0; }
+    void clear() { node<value_type> *n; while((n = _list.remHead()) != nullptr) { alloc.destroy(n); alloc.deallocate(n, 1); }; count = 0; }
 
     // Operations
     void splice(iterator position, list& x) {
-        node<value_type> *first = (node<value_type> *)GetHead(&x._list);
-        node<value_type> *last = (node<value_type> *)GetTail(&x._list);
+        node<value_type> *first = x._list.getHead();
+        node<value_type> *last = x._list.getTail();
         if (first)
         {
-            first->mn.mln_Pred = position.n->mn.mln_Pred;
-            last->mn.mln_Succ = (struct MinNode *)position.n;
+            first->pred = position.n->pred;
+            last->succ = position.n;
 
-            first->mn.mln_Pred->mln_Succ = (struct MinNode *)first;
-            last->mn.mln_Succ->mln_Pred = (struct MinNode *)last;
+            first->pred->succ = first;
+            last->succ->pred = last;
 
-            NEWLIST(&x._list);
+            x._list = minlist<value_type>();
             count += x.count;
             x.count = 0;
         }
@@ -347,68 +371,69 @@ public:
         if (i != x.end())
         {
             node<value_type> *n = i.n;
-            REMOVE((MinNode *)n);
+            n->remove();
             x.count--;
 
-            n->mn.mln_Pred = position.n->mn.mln_Pred;
-            n->mn.mln_Succ = (struct MinNode *)position.n;
+            n->pred = position.n->pred;
+            n->succ = position.n;
 
-            n->mn.mln_Succ->mln_Pred = (struct MinNode *)n;
-            n->mn.mln_Pred->mln_Succ = (struct MinNode *)n;
+            n->succ->pred = n;
+            n->pred->succ = n;
 
             count++;
         }
     }
     void splice (iterator position, list& x, iterator first, iterator last) {
-        MinList l;
-        NEWLIST(&l);
+        minlist<value_type> l;
         iterator it(first);
         while (it != last)
         {
             node<value_type> *no = it.n;
             ++it;
-            REMOVE((MinNode *)no);
+            no->remove();
             x.count--;
-            ADDTAIL(&l, (MinNode *)no);
+            l.addTail(no);
             count++;
         }
 
         //printf("splice: list @ %p, Head: %p, Tail: %p, TailPred: %p\n", (void*)&l, (void*)l.mlh_Head, (void*)l.mlh_Tail, (void*)l.mlh_TailPred);
 
-        node<value_type> *fi = (node<value_type> *)GetHead(&l);
-        node<value_type> *la = (node<value_type> *)GetTail(&l);
+        node<value_type> *fi = l.getHead();
+        node<value_type> *la = l.getTail();
 
         printf("first: %p, last: %p\n", (void*)fi, (void*)la);
         if (fi)
         {
-            fi->mn.mln_Pred = position.n->mn.mln_Pred;
-            la->mn.mln_Succ = (struct MinNode *)position.n;
+            fi->pred = position.n->pred;
+            la->succ = position.n;
 
-            fi->mn.mln_Pred->mln_Succ = (struct MinNode *)fi;
-            la->mn.mln_Succ->mln_Pred = (struct MinNode *)la;
+            fi->pred->succ = fi;
+            la->succ->pred = la;
         }
     }
     void remove(const value_type& val) {
-        node<value_type> *n, *next;
-        ForeachNodeSafe(&_list, n, next) {
+        node<value_type> *n = _list.getHead(), *next;
+        while(n) {
+            next = n->getSucc();
             if (n->value == val) {
-                REMOVE(n);
+                n->remove();
                 alloc.destroy(n);
                 alloc.deallocate(n, 1);
                 count--;
             }
+            n = next;
         }
     }
     // remove_if
     void unique() {
         node<value_type> *n;
-        ForeachNode(&_list, n) {
+        for(n = _list.getHead(); n; n = n->getSucc()) {
             node<value_type> *n1, *next;
-            n1 = (node<value_type> *)GetSucc(n);
+            n1 = n->getSucc();
             while(n1) {
-                next = (node<value_type> *)GetSucc(n1);
+                next = n1->getSucc();
                 if (n1->value == n->value) {
-                    REMOVE(n1);
+                    n1->remove();
                     count--;
                     alloc.destroy(n1);
                     alloc.deallocate(n1, 1);
@@ -418,10 +443,9 @@ public:
         }
     }
     void merge(list &x) {
-        node<value_type> *n, *next;
-        ForeachNodeSafe(&x._list, n, next) {
-            REMOVE(x);
-            ADDTAIL(&_list, x);
+        node<value_type> *n;
+        while ((n = x._list.remHead()) != nullptr) {
+            _list.addTail(x);
             count++;
         }
         x.count = 0;
@@ -437,7 +461,7 @@ public:
         printf("TAIL @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->mn.mln_Succ), (void *)(n->mn.mln_Pred));
     }
 private:
-    MinList             _list;
+    minlist<T>          _list;
     size_type           count;
     allocator_type      alloc;
 };
