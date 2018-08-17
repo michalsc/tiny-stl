@@ -177,18 +177,16 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
             mylist1.splice (it, mylist2); // mylist1: 1 10 20 30 2 3 4
                                             // mylist2 (empty)
                                             // "it" still points to 2 (the 5th element)
-                                          
             mylist2.splice (mylist2.begin(),mylist1, it);
                                             // mylist1: 1 10 20 30 3 4
                                             // mylist2: 2
                                             // "it" is now invalid.
-#if 1
             it = mylist1.begin();
             std::advance(it,3);           // "it" points now to 30
 
             mylist1.splice ( mylist1.begin(), mylist1, it, mylist1.end());
                                             // mylist1: 30 3 4 1 10 20
-#endif
+
             int test_list_1[] = { 30, 3, 4, 1, 10, 20 };
             int test_list_2[] = { 2 };
             int i = 0;

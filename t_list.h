@@ -19,7 +19,7 @@ namespace {
         T       value;
 
         node(const T& val) : succ(nullptr), pred(nullptr), value(val) {}
-        void remove() { pred->succ = succ; succ->pred = pred; }
+        void remove() { pred->succ = succ; succ->pred = pred; pred = nullptr; succ = nullptr;}
         node *getSucc() { if (succ && succ->succ) return succ; else return nullptr; }
         node *getPred() { if (pred && pred->pred) return pred; else return nullptr; }
     };
@@ -31,6 +31,7 @@ namespace {
         node<T> *tailPred;
 
         minlist() : head((node<T> *)&tail), tail(nullptr), tailPred((node<T> *)&head) { }
+        void reset() { head = (node<T> *)&tail; tail = nullptr; tailPred = (node<T> *)&head; }
         bool isEmpty() { return tailPred == (node<T> *)&head; }
         void addHead(node<T> *n) { n->succ = head; n->pred = (node<T> *)&head; head->pred = n; head = n; }
         void addTail(node<T> *n) { n->succ = (node<T> *)&tail; n->pred = tailPred; tailPred->succ = n; tailPred = n; }
@@ -356,13 +357,23 @@ public:
         node<value_type> *last = x._list.getTail();
         if (first)
         {
-            first->pred = position.n->pred;
-            last->succ = position.n;
+            if (position.n == _list.head)
+            {
+                first->pred = (node<T> *)&_list.head;
+                last->succ = _list.head;
+                
+                _list.head->pred = last;
+                _list.head = first;
+            }
+            else
+            {
+                first->pred = position.n->pred;
+                last->succ = position.n;
 
-            first->pred->succ = first;
-            last->succ->pred = last;
-
-            x._list = minlist<value_type>();
+                first->pred->succ = first;
+                last->succ->pred = last;
+            }
+            x._list.reset();
             count += x.count;
             x.count = 0;
         }
@@ -374,11 +385,22 @@ public:
             n->remove();
             x.count--;
 
-            n->pred = position.n->pred;
-            n->succ = position.n;
+            if (position.n == _list.head)
+            {
+                n->pred = (node<T> *)&_list.head;
+                n->succ = _list.head;
+                
+                _list.head->pred = n;
+                _list.head = n;
+            }
+            else
+            {
+                n->pred = position.n->pred;
+                n->succ = position.n;
 
-            n->succ->pred = n;
-            n->pred->succ = n;
+                n->succ->pred = n;
+                n->pred->succ = n;
+            }
 
             count++;
         }
@@ -396,20 +418,29 @@ public:
             count++;
         }
 
-        //printf("splice: list @ %p, Head: %p, Tail: %p, TailPred: %p\n", (void*)&l, (void*)l.mlh_Head, (void*)l.mlh_Tail, (void*)l.mlh_TailPred);
-
         node<value_type> *fi = l.getHead();
         node<value_type> *la = l.getTail();
 
-        printf("first: %p, last: %p\n", (void*)fi, (void*)la);
         if (fi)
         {
-            fi->pred = position.n->pred;
-            la->succ = position.n;
+            if (position.n == _list.head)
+            {
+                fi->pred = (node<T> *)&_list.head;
+                la->succ = _list.head;
+                
+                _list.head->pred = la;
+                _list.head = fi;
+            }
+            else
+            {
+                fi->pred = position.n->pred;
+                la->succ = position.n;
 
-            fi->pred->succ = fi;
-            la->succ->pred = la;
+                fi->pred->succ = fi;
+                la->succ->pred = la;
+            }
         }
+                //test();
     }
     void remove(const value_type& val) {
         node<value_type> *n = _list.getHead(), *next;
@@ -453,12 +484,20 @@ public:
     // sort
     // reverse
     void test() {
-        node<value_type> *n = (node<value_type> *)GetHead(&_list);
+        node<value_type> *n = _list.getHead();
         printf("list=%p, list->head=%p, list->tail=%p, list->tailpred=%p\n",
-               (void *)&_list, (void *)(_list.mlh_Head), (void *)(_list.mlh_Tail), (void *)(_list.mlh_TailPred));
-        printf("HEAD @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->mn.mln_Succ), (void *)(n->mn.mln_Pred));
-        n = (node<value_type> *)GetTail(&_list);
-        printf("TAIL @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->mn.mln_Succ), (void *)(n->mn.mln_Pred));
+               (void *)&_list, (void *)(_list.head), (void *)(_list.tail), (void *)(_list.tailPred));
+        printf("  HEAD @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
+
+        n = n->getSucc();
+        while(n != _list.getTail())
+        {
+            printf("  node @ %p. node->succ=%p node->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
+            n = n->getSucc();
+        }
+
+        n = _list.getTail();
+        printf("  TAIL @ %p. Tail->succ=%p Tail->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
     }
 private:
     minlist<T>          _list;
