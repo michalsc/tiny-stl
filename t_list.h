@@ -18,27 +18,53 @@ namespace {
         node    *pred;
         T       value;
 
-        node(const T& val) : succ(nullptr), pred(nullptr), value(val) {}
-        void remove() { pred->succ = succ; succ->pred = pred; pred = nullptr; succ = nullptr;}
-        node *getSucc() { if (succ && succ->succ) return succ; else return nullptr; }
-        node *getPred() { if (pred && pred->pred) return pred; else return nullptr; }
+        explicit node() : succ(nullptr), pred(nullptr) {}
+        explicit node(const T& val) : succ(nullptr), pred(nullptr), value(val) {}
+        void remove() { this->pred->succ = this->succ; this->succ->pred = this->pred; pred = nullptr; succ = nullptr; }
+        node<T> *getSucc() { if (succ && succ->succ) return succ; else return nullptr; }
+        node<T> *getPred() { if (pred && pred->pred) return pred; else return nullptr; }
+    };
+
+    template <class T>
+    class node_allocator {
+    public:
+        typedef node<T>             value_type;
+        typedef value_type*         pointer;
+        typedef value_type&         reference;
+        typedef const value_type&   const_reference;
+        typedef const value_type*   const_pointer;
+        typedef uintptr_t           size_type;
+        typedef ptrdiff_t           difference_type;
+        
+        node_allocator() : alloc() {}
+        node_allocator(const node_allocator&) : node_allocator() {}
+        ~node_allocator() {}
+        pointer address(reference x) { return &x; }
+        const_pointer address(const_reference x) { return &x; }
+        pointer allocate(size_type n) { pointer p = alloc.allocate(n); return p; }
+        void deallocate(pointer p, size_type n) { alloc.deallocate(p, n); }
+        size_type max_size() { return alloc.max_size(); }
+        void construct(pointer p, const T& val) { new((void*)p) value_type(val); }
+        void destroy(pointer p) { p->~value_type(); }
+
+    private:
+        allocator<node<T> >     alloc;
     };
 
     template <class T>
     struct minlist {
-        node<T> *head;
-        node<T> *tail;
-        node<T> *tailPred;
+        node<T> listHead;
+        node<T> listTail;
 
-        minlist() : head((node<T> *)&tail), tail(nullptr), tailPred((node<T> *)&head) { }
-        void reset() { head = (node<T> *)&tail; tail = nullptr; tailPred = (node<T> *)&head; }
-        bool isEmpty() { return tailPred == (node<T> *)&head; }
-        void addHead(node<T> *n) { n->succ = head; n->pred = (node<T> *)&head; head->pred = n; head = n; }
-        void addTail(node<T> *n) { n->succ = (node<T> *)&tail; n->pred = tailPred; tailPred->succ = n; tailPred = n; }
-        node<T> *getHead() const { return head->succ ? head : nullptr; }
-        node<T> *getTail() const { return tailPred->pred ? tailPred : nullptr; }
-        node<T> *remHead() { node<T> *head = getHead(); if (head) head->remove(); return head; }
-        node<T> *remTail() { node<T> *tail = getTail(); if (tail) tail->remove(); return tail; }
+        minlist() { reset(); }
+        void reset() { listHead.succ = &listTail; listHead.pred = nullptr; listTail.pred = &listHead; listTail.succ = nullptr;  }
+        bool isEmpty() { return listHead.succ == &listTail; }
+        void addHead(node<T> *n) { n->succ = listHead.succ; n->pred = &listHead; listHead.succ->pred = n; listHead.succ = n; }
+        void addTail(node<T> *n) { n->succ = &listTail; n->pred = listTail.pred; listTail.pred->succ = n; listTail.pred = n; }
+        node<T> *getHead() const { return listHead.succ == &listTail ? nullptr : listHead.succ; }
+        node<T> *getTail() const { return listTail.pred == &listHead ? nullptr : listTail.pred; }
+        node<T> *remHead() { node<T> *n = getHead(); if (n) n->remove(); return n; }
+        node<T> *remTail() { node<T> *n = getTail(); if (n) n->remove(); return n; }
     };
 }
 
@@ -51,7 +77,7 @@ public:
     typedef value_type*             pointer;
     typedef const value_type*       const_pointer;
     typedef intptr_t                size_type;
-    typedef allocator<node<value_type> >            allocator_type;
+    typedef node_allocator<T>       allocator_type;
 
     class const_iterator;
     // Bidirectional iterator for list
@@ -192,10 +218,10 @@ public:
     list& operator= (const list& x) { clear(); node<value_type> *n = x._list.getHead(); while(n) { push_back(n->value); n = n->getSucc(); } return *this; }
     
     // Iterators
-    iterator begin() { return iterator(_list.head); }
-    iterator end() { return iterator((node<value_type> *)&_list.tail); }
-    reverse_iterator rbegin() { return reverse_iterator(_list.tailPred); }
-    reverse_iterator rend() { return reverse_iterator((node<value_type> *)&_list.head); }
+    iterator begin() { return iterator(_list.listHead.succ); }
+    iterator end() { return iterator(&_list.listTail); }
+    reverse_iterator rbegin() { return reverse_iterator(_list.listTail.pred); }
+    reverse_iterator rend() { return reverse_iterator(&_list.listHead); }
 
     // Capacity
     size_type size() { return count; }
@@ -218,7 +244,7 @@ public:
     void assign(size_type n, const value_type &val) { clear(); while(n--) push_front(val); }
     void push_front(const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
-        alloc.construct(n, node<value_type>(val));
+        alloc.construct(n, val);
         _list.addHead(n); count++;
     }
     void pop_front() {
@@ -250,7 +276,7 @@ public:
     }
     iterator insert(iterator position, const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
-        alloc.construct(n, node<value_type>(val));
+        alloc.construct(n, val);
         
         n->succ = position.n->succ;
         n->pred = position.n;
@@ -275,7 +301,7 @@ public:
             while(n--)
             {
                 node<value_type> *no = alloc.allocate(1);
-                alloc.construct(no, node<value_type>(val));
+                alloc.construct(no, val);
                 l.addTail(no);
             }
 
@@ -296,7 +322,7 @@ public:
         for (auto it=first; it != last; ++it)
         {
             node<value_type> *no = alloc.allocate(1);
-            alloc.construct(no, node<value_type>(*it));
+            alloc.construct(no, *it);
             l.addTail(no);
             count++;
         }
@@ -357,15 +383,6 @@ public:
         node<value_type> *last = x._list.getTail();
         if (first)
         {
-            if (position.n == _list.head)
-            {
-                first->pred = (node<T> *)&_list.head;
-                last->succ = _list.head;
-                
-                _list.head->pred = last;
-                _list.head = first;
-            }
-            else
             {
                 first->pred = position.n->pred;
                 last->succ = position.n;
@@ -384,16 +401,6 @@ public:
             node<value_type> *n = i.n;
             n->remove();
             x.count--;
-
-            if (position.n == _list.head)
-            {
-                n->pred = (node<T> *)&_list.head;
-                n->succ = _list.head;
-                
-                _list.head->pred = n;
-                _list.head = n;
-            }
-            else
             {
                 n->pred = position.n->pred;
                 n->succ = position.n;
@@ -423,15 +430,6 @@ public:
 
         if (fi)
         {
-            if (position.n == _list.head)
-            {
-                fi->pred = (node<T> *)&_list.head;
-                la->succ = _list.head;
-                
-                _list.head->pred = la;
-                _list.head = fi;
-            }
-            else
             {
                 fi->pred = position.n->pred;
                 la->succ = position.n;
@@ -440,7 +438,6 @@ public:
                 la->succ->pred = la;
             }
         }
-                //test();
     }
     void remove(const value_type& val) {
         node<value_type> *n = _list.getHead(), *next;
@@ -455,7 +452,20 @@ public:
             n = next;
         }
     }
-    // remove_if
+    template <class Predicate>
+    void remove_if(Predicate pred) {
+        node<value_type> *n = _list.getHead(), *next;
+        while(n) {
+            next = n->getSucc();
+            if (pred(n->value)) {
+                n->remove();
+                alloc.destroy(n);
+                alloc.deallocate(n, 1);
+                count--;
+            }
+            n = next;
+        }
+    }
     void unique() {
         node<value_type> *n;
         for(n = _list.getHead(); n; n = n->getSucc()) {
@@ -476,17 +486,93 @@ public:
     void merge(list &x) {
         node<value_type> *n;
         while ((n = x._list.remHead()) != nullptr) {
-            _list.addTail(x);
+            node<value_type> *no = _list.getHead();
+            if (n->value < no->value) {
+                n->pred = &_list.listHead;
+                n->succ = _list.listHead.succ;
+            
+                _list.listHead.succ->pred = n;
+                _list.listHead.succ = n;
+            } else {
+                while (no && no->value < n->value) no = no->getSucc();
+                if (no) {
+                    n->pred = no;
+                    n->succ = no->succ;
+                    n->pred->succ = n;
+                    n->succ->pred = n;
+                } else _list.addTail(n);
+            }
             count++;
         }
         x.count = 0;
     }
-    // sort
-    // reverse
+    void sort() {
+        node<value_type> *n;
+        minlist<value_type> l;
+        if (count > 1) {
+            n = _list.remHead();
+            l.addHead(n);
+            while((n = _list.remHead())) {
+                node<value_type> *no = l.getHead();
+                if (n->value < no->value) {
+                    n->pred = &l.listHead;
+                    n->succ = l.listHead.succ;
+                
+                    l.listHead.succ->pred = n;
+                    l.listHead.succ = n;
+                } else {
+                    while (no && no->value < n->value) no = no->getSucc();
+                    if (no) {
+                        n->pred = no;
+                        n->succ = no->succ;
+                        n->pred->succ = n;
+                        n->succ->pred = n;
+                    } else l.addTail(n);
+                }
+            }
+            while ((n = l.remHead())) _list.addTail(n);
+        }
+    }
+    template <class Compare>
+    void sort (Compare comp) {
+        node<value_type> *n;
+        minlist<value_type> l;
+        if (count > 1) {
+            n = _list.remHead();
+            l.addHead(n);
+            while((n = _list.remHead())) {
+                node<value_type> *no = l.getHead();
+                if (comp(n->value, no->value)) {
+                    n->pred = &l.listHead;
+                    n->succ = l.listHead.succ;
+                
+                    l.listHead.succ->pred = n;
+                    l.listHead.succ = n;
+                } else {
+                    while (no && comp(no->value, n->value)) no = no->getSucc();
+                    if (no) {
+                        n->pred = no;
+                        n->succ = no->succ;
+                        n->pred->succ = n;
+                        n->succ->pred = n;
+                    } else l.addTail(n);
+                }
+            }
+
+            while((n = l.remHead())) _list.addTail(n);
+        }
+    }
+    void reverse() {
+        minlist<value_type> l;
+        node<value_type> *n;
+
+        while((n = _list.remHead())) l.addHead(n);
+        while((n = l.remHead())) _list.addTail(n);
+    }
     void test() {
         node<value_type> *n = _list.getHead();
-        printf("list=%p, list->head=%p, list->tail=%p, list->tailpred=%p\n",
-               (void *)&_list, (void *)(_list.head), (void *)(_list.tail), (void *)(_list.tailPred));
+        printf("list=%p, head=%p, head.succ=%p, tail=%p, tail.pred=%p\n",
+               (void *)&_list, (void *)(&_list.listHead), (void*)_list.listHead.succ, (void *)(&_list.listTail), (void *)(_list.listTail.pred));
         printf("  HEAD @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
 
         n = n->getSucc();

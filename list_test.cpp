@@ -2,6 +2,31 @@
 #include "t_string.h"
 #include "catch.hpp"
 
+// a predicate implemented as a function:
+bool single_digit (const int& value) { return (value<10); }
+
+// a predicate implemented as a class:
+struct is_odd {
+bool operator() (const int& value) { return (value%2)==1; }
+};
+
+// comparison, not case sensitive.
+bool compare_nocase (t_std::string& first, t_std::string& second)
+{
+  unsigned int i=0;
+  while ( (i<first.length()) && (i<second.length()) )
+  {
+    if (tolower(first[i])<tolower(second[i])) return true;
+    else if (tolower(first[i])>tolower(second[i])) return false;
+    ++i;
+  }
+  return ( first.length() < second.length() );
+}
+
+// compare only integral part:
+bool mycomparison (double first, double second)
+{ return ( int(first)<int(second) ); }
+
 TEST_CASE("t_std::list class", "[t_std::list]") {
 
     SECTION("Constructors") {
@@ -212,7 +237,105 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
                 CHECK( test_list_2[i] == *it );
             }
         }
+
+        {
+            int myints[]= {17,89,7,14};
+            t_std::list<int> mylist (myints,myints+4);
+
+            mylist.remove(89);
+
+            int test_list[] = { 17, 7, 14 };
+            int i=0;
+            for (auto it=mylist.begin(); it!=mylist.end(); ++it, ++i) {
+                CHECK( test_list[i] == *it );
+            }
+        }
+
+        {
+            // See predicates on top of that file
+
+            int myints[]= {15,36,7,17,20,39,4,1};
+            t_std::list<int> mylist (myints,myints+8);   // 15 36 7 17 20 39 4 1
+
+            mylist.remove_if (single_digit);           // 15 36 17 20 39
+
+            mylist.remove_if (is_odd());               // 36 20
+
+            int test_list[] = { 36, 20 };
+            int i=0;
+            for (auto it=mylist.begin(); it!=mylist.end(); ++it, ++i) {
+                CHECK( test_list[i] == *it );
+            }
+        }
+
+        {
+            t_std::list<double> first, second;
+
+            first.push_back (3.1);
+            first.push_back (2.2);
+            first.push_back (2.9);
+
+            second.push_back (3.7);
+            second.push_back (7.1);
+            second.push_back (1.4);
+
+            first.sort();
+            second.sort();
+
+            first.merge(second);
+
+            // (second is now empty)
+
+            second.push_back (2.1);
+
+            //first.merge(second, mycomparison);
+
+            double test_list[] = { 1.4, 2.2, 2.9, 2.1, 3.1, 3.7, 7.1 };
+            int i=0;
+
+            for (auto it=first.begin(); it != first.end(); ++it, ++i)
+            {
+                CHECK( test_list[i] == *it );
+            }
+        }
+
+        {
+            t_std::list<t_std::string> mylist;
+            t_std::list<t_std::string>::iterator it;
+            mylist.push_back ("one");
+            mylist.push_back ("two");
+            mylist.push_back ("Three");
+
+            mylist.sort();
+
+            char *list[] = { "Three", "one", "two" };
+            int i=0;
+            
+            for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
+                CHECK( *it == list[i] );
+            }
+
+            mylist.sort(compare_nocase);
+
+            char *list_2[] = { "one", "Three", "two" };
+            i=0;
+            
+            for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
+                CHECK( *it == list_2[i] );
+            }
+        }
+
+        {
+            t_std::list<int> mylist;
+
+            for (int i=1; i<10; ++i) mylist.push_back(i);
+
+            mylist.reverse();
+            int i=9;
+            for (auto it = mylist.begin(); it != mylist.end(); ++it,--i)
+            {
+                CHECK( *it == i );
+            }
+        }
     }
-
-
 }

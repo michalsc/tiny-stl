@@ -21,7 +21,7 @@ public:
     typedef uintptr_t           size_type;
     typedef ptrdiff_t           difference_type;
 
-    allocator() : construct_count(0), deconstruct_count(0), allocate_count(0), deallocate_count(0) { printf("Allocator @ %p for type %s\n", (void*)this, typeid(T).name()); };
+    allocator() : construct_count(0), deconstruct_count(0), allocate_count(0), deallocate_count(0) { printf("Allocator @ %p for type %s with sizeof %d\n", (void*)this, typeid(T).name(), (int)sizeof(T)); };
     allocator(const allocator&) : allocator() {};
     ~allocator() { printf("Destroying allocator @ %p for type %s\n", (void*)this, typeid(T).name()); 
         if (construct_count != deconstruct_count || allocate_count != deallocate_count) printf("Constructed: %d, Deconstructed: %d\nAllocated: %d, Deallocated: %d\n", construct_count, deconstruct_count, allocate_count, deallocate_count); }

@@ -28,6 +28,7 @@
         "atomic": "cpp",
         "limits": "cpp",
         "ratio": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "locale": "cpp"
     }
 }
