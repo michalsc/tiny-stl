@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "t_string.h"
-#include "t_list.h"
+#include <tinystd/string>
+#include <tinystd/list>
 
 static const char __attribute__((used)) version[] = "\0$VER: MiniStd " VERSION_STRING;
 
@@ -20,8 +20,8 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    t_std::list<int> list(10, 0);
-    t_std::list<t_std::string> list2;
+    tinystd::list<int> list(10, 0);
+    tinystd::list<tinystd::string> list2;
     
     list.test();
     list.push_front(10);
@@ -45,17 +45,17 @@ int main(int argc, char **argv)
     printf("%ld\n", list.max_size());
     printf("%ld\n", list2.max_size());
 
-    t_std::string str = "Hello";
-    t_std::string s0("Initial string");
+    tinystd::string str = "Hello";
+    tinystd::string s0("Initial string");
 
     // constructors used in the same order as described above:
-    t_std::string s1;
-    t_std::string s2(s0);
-    t_std::string s3(s0, 8, 3);
-    t_std::string s4("A character sequence");
-    t_std::string s5("Another character sequence", 12);
-    t_std::string s6a(10, 'x');
-    t_std::string s6b(10, 42);
+    tinystd::string s1;
+    tinystd::string s2(s0);
+    tinystd::string s3(s0, 8, 3);
+    tinystd::string s4("A character sequence");
+    tinystd::string s5("Another character sequence", 12);
+    tinystd::string s6a(10, 'x');
+    tinystd::string s6b(10, 42);
 
     printf("MiniStd\n");
     printf("str.length = %d\n", str.length());
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
         printf("%c ", *it);
     printf("\n");
 
-    t_std::string sx = t_std::to_string(((unsigned long long)0xffffffffffffffffULL));
+    tinystd::string sx = tinystd::to_string(((unsigned long long)0xffffffffffffffffULL));
     printf("'%s'\n", sx.c_str());
 
     return 0;

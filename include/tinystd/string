@@ -8,15 +8,14 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#ifndef _T_STRING_H
-#define _T_STRING_H
+#ifndef _TINYSTD_STRING
+#define _TINYSTD_STRING
 
 #include <ostream>
 #include <iterator>
+#include <tinystd/bits/support.h>
 
-#include "support.h"
-
-namespace t_std {
+namespace tinystd {
 
 // Exception-free std::string reimplementation.
 // Unimplemented methods:
@@ -354,4 +353,4 @@ std::ostream &operator<<(std::ostream &os, string const &str);
 
 }
 
-#endif // _T_STRING_H
+#endif // _TINYSTD_STRING

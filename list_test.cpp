@@ -1,5 +1,5 @@
-#include "t_list.h"
-#include "t_string.h"
+#include <tinystd/list>
+#include <tinystd/string>
 #include "catch.hpp"
 
 // a predicate implemented as a function:
@@ -11,7 +11,7 @@ bool operator() (const int& value) { return (value%2)==1; }
 };
 
 // comparison, not case sensitive.
-bool compare_nocase (t_std::string& first, t_std::string& second)
+bool compare_nocase (tinystd::string& first, tinystd::string& second)
 {
   unsigned int i=0;
   while ( (i<first.length()) && (i<second.length()) )
@@ -27,17 +27,17 @@ bool compare_nocase (t_std::string& first, t_std::string& second)
 bool mycomparison (double first, double second)
 { return ( int(first)<int(second) ); }
 
-TEST_CASE("t_std::list class", "[t_std::list]") {
+TEST_CASE("tinystd::list class", "[tinystd::list]") {
 
     SECTION("Constructors") {
-        t_std::list<int> first;                                // empty list of ints
-        t_std::list<int> second (4,100);                       // four ints with value 100
-        t_std::list<int> third (second.begin(),second.end());  // iterating through second
-        t_std::list<int> fourth (third); 
+        tinystd::list<int> first;                                // empty list of ints
+        tinystd::list<int> second (4,100);                       // four ints with value 100
+        tinystd::list<int> third (second.begin(),second.end());  // iterating through second
+        tinystd::list<int> fourth (third); 
 
         // the iterator constructor can also be used to construct from arrays:
         int myints[] = {16,2,77,29};
-        t_std::list<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
+        tinystd::list<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
 
         CHECK( first.empty() == true );
         CHECK( second.empty() == false );
@@ -51,18 +51,18 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         CHECK( fifth.size() == 4 );
 
         int i=0;
-        for (t_std::list<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
+        for (tinystd::list<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
         {
             CHECK( myints[i++] == *it );
         }
     }
 
     SECTION("Assign operator") {
-        t_std::list<int> first (3);      // list of 3 zero-initialized ints
-        t_std::list<int> second (5);     // list of 5 zero-initialized ints
+        tinystd::list<int> first (3);      // list of 3 zero-initialized ints
+        tinystd::list<int> second (5);     // list of 5 zero-initialized ints
 
         second = first;
-        first = t_std::list<int>();
+        first = tinystd::list<int>();
 
         CHECK( first.size() == 0);
         CHECK( second.size() == 3);
@@ -70,16 +70,16 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
     SECTION("Iterators") {
         int myints[] = {75,23,65,42,13};
-        t_std::list<int> mylist (myints,myints+5);
+        tinystd::list<int> mylist (myints,myints+5);
         
         int i=0;
-        for (t_std::list<int>::iterator it = mylist.begin(); it != mylist.end(); ++it)
+        for (tinystd::list<int>::iterator it = mylist.begin(); it != mylist.end(); ++it)
         {
             CHECK( myints[i++] == *it );
         }
 
         i=4;
-        for (t_std::list<int>::reverse_iterator it = mylist.rbegin(); it != mylist.rend(); ++it)
+        for (tinystd::list<int>::reverse_iterator it = mylist.rbegin(); it != mylist.rend(); ++it)
         {
             CHECK( myints[i--] == *it );
         }
@@ -87,7 +87,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
     SECTION("Capacity") {
         {
-            t_std::list<int> mylist;
+            tinystd::list<int> mylist;
             int sum (0);
 
             for (int i=1;i<=10;++i) mylist.push_back(i);
@@ -102,7 +102,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<int> myints;
+            tinystd::list<int> myints;
             CHECK( myints.size() == 0 );
 
             for (int i=0; i<10; i++) myints.push_back(i);
@@ -121,7 +121,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
     SECTION("Element access") {
         {
-            t_std::list<int> mylist;
+            tinystd::list<int> mylist;
 
             mylist.push_back(77);
             mylist.push_back(22);
@@ -134,7 +134,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<int> mylist;
+            tinystd::list<int> mylist;
 
             mylist.push_back(10);
 
@@ -151,8 +151,8 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<int> mylist;
-            t_std::list<int>::iterator it1,it2;
+            tinystd::list<int> mylist;
+            tinystd::list<int>::iterator it1,it2;
 
             // set some values:
             for (int i=1; i<10; ++i) mylist.push_back(i*10);
@@ -186,8 +186,8 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
     SECTION("Operations") {
         {
-            t_std::list<int> mylist1, mylist2;
-            t_std::list<int>::iterator it;
+            tinystd::list<int> mylist1, mylist2;
+            tinystd::list<int>::iterator it;
 
             // set some initial values:
             for (int i=1; i<=4; ++i)
@@ -216,9 +216,9 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
             int test_list_2[] = { 2 };
             int i = 0;
 
-            t_std::string str = "";
+            tinystd::string str = "";
             for (it=mylist1.begin(); it!=mylist1.end(); ++it) {
-                str += t_std::to_string(*it);
+                str += tinystd::to_string(*it);
                 str += " ";
             }
             INFO( "list1: " << str.c_str() << " count: " << mylist1.size());
@@ -228,7 +228,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
             str = "";
             for (it=mylist2.begin(); it!=mylist2.end(); ++it) {
-                str += t_std::to_string(*it);
+                str += tinystd::to_string(*it);
                 str += " ";
             }
             INFO( "list2: " << str.c_str() << " count: " << mylist2.size());
@@ -240,7 +240,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
         {
             int myints[]= {17,89,7,14};
-            t_std::list<int> mylist (myints,myints+4);
+            tinystd::list<int> mylist (myints,myints+4);
 
             mylist.remove(89);
 
@@ -255,7 +255,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
             // See predicates on top of that file
 
             int myints[]= {15,36,7,17,20,39,4,1};
-            t_std::list<int> mylist (myints,myints+8);   // 15 36 7 17 20 39 4 1
+            tinystd::list<int> mylist (myints,myints+8);   // 15 36 7 17 20 39 4 1
 
             mylist.remove_if (single_digit);           // 15 36 17 20 39
 
@@ -269,7 +269,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<double> first, second;
+            tinystd::list<double> first, second;
 
             first.push_back (3.1);
             first.push_back (2.2);
@@ -300,8 +300,8 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<t_std::string> mylist;
-            t_std::list<t_std::string>::iterator it;
+            tinystd::list<tinystd::string> mylist;
+            tinystd::list<tinystd::string>::iterator it;
             mylist.push_back ("one");
             mylist.push_back ("two");
             mylist.push_back ("Three");
@@ -326,7 +326,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
         }
 
         {
-            t_std::list<int> mylist;
+            tinystd::list<int> mylist;
 
             for (int i=1; i<10; ++i) mylist.push_back(i);
 

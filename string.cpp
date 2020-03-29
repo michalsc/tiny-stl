@@ -7,12 +7,12 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include "t_string.h"
-#include "support.h"
+#include <tinystd/string>
+#include <tinystd/bits/support.h>
 
 #include <ostream>
 
-namespace t_std {
+namespace tinystd {
 
 const char string::_null = 0;
 
