@@ -1,5 +1,8 @@
 {
     "files.associations": {
+        "list": "cpp",
+        "string": "cpp",
+        "allocator": "cpp",
         "iosfwd": "cpp",
         "__bit_reference": "cpp",
         "__split_buffer": "cpp",
@@ -9,7 +12,6 @@
         "iterator": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "string": "cpp",
         "string_view": "cpp",
         "vector": "cpp",
         "memory": "cpp",
