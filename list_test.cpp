@@ -308,7 +308,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
             mylist.sort();
 
-            char *list[] = { "Three", "one", "two" };
+            const char *list[] = { "Three", "one", "two" };
             int i=0;
             
             for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
@@ -317,7 +317,7 @@ TEST_CASE("t_std::list class", "[t_std::list]") {
 
             mylist.sort(compare_nocase);
 
-            char *list_2[] = { "one", "Three", "two" };
+            const char *list_2[] = { "one", "Three", "two" };
             i=0;
             
             for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
