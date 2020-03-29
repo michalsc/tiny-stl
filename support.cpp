@@ -84,8 +84,12 @@ int _strcmp_(const char *str1, const char *str2)
 int _strlen_(const char *str)
 {
     int len = 0;
+    const char *s = str;
 
-    if (str) while(*str++ != 0) len++;
+    if (str) {
+        while(*str++ != 0);
+        len = str - s - 1;
+    }
 
     return len;
 }
