@@ -1,0 +1,261 @@
+/*  -*- C++ -*-
+
+    Copyright © 2020 Michal Schulz <michal.schulz@gmx.de>
+    https://github.com/michalsc
+
+    This Source Code Form is subject to the terms of the
+    Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
+    with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#ifndef _TINYSTD_VECTOR
+#define _TINYSTD_VECTOR
+
+#include <stdio.h>
+#include <stdint.h>
+#include <iterator>
+#include <type_traits>
+#include <exception>
+#include <initializer_list>
+#include <tinystd/bits/support.h>
+#include <tinystd/allocator>
+
+namespace tinystd {
+
+template < class T, class Alloc = allocator<T> >
+class vector {
+public:
+    typedef T                       value_type;
+    typedef Alloc                   allocator_type;
+    typedef value_type&             reference;
+    typedef const value_type&       const_reference;
+    typedef value_type*             pointer;
+    typedef const value_type*       const_pointer;
+    typedef intptr_t                size_type;
+    typedef ptrdiff_t               difference_type;
+
+    // Interators
+    class const_iterator;
+    // Bidirectional iterator for list
+    class iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        pointer n;
+
+    public:
+        iterator() : n(nullptr) {};
+        iterator(pointer node) : n(node) {};
+        iterator(const iterator &it) : n(it.n){};
+        value_type& operator*() const { return *n; }
+
+        iterator &operator++()
+        {
+            n++;
+            return *this;
+        }
+        iterator &operator--()
+        {
+            n--;
+            return *this;
+        }
+        iterator operator++(int)
+        {
+            iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        iterator operator--(int)
+        {
+            iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const iterator &rhs) const { return n != rhs.n; }
+
+        friend class vector::const_iterator;
+        friend class vector;
+    };
+
+    class const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        const pointer n;
+
+      public:
+        const_iterator() : n(nullptr){};
+        const_iterator(pointer node) : n(node){};
+        const_iterator(const const_iterator &it) : n(it.n){};
+        const_iterator(const typename vector<value_type>::iterator &it) : n(it.n) {};
+        value_type &operator*() const { return n->value; }
+
+        const_iterator &operator++()
+        {
+            n++;
+            return *this;
+        }
+        const_iterator &operator--()
+        {
+            n--;
+            return *this;
+        }
+        const_iterator operator++(int)
+        {
+            const_iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        const_iterator operator--(int)
+        {
+            const_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const const_iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const const_iterator &rhs) const { return n != rhs.n; }
+
+        friend class vector;
+    };
+
+    class const_reverse_iterator;
+    // Bidirectional iterator for list
+    class reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        pointer n;
+
+    public:
+        reverse_iterator() : n(nullptr) {};
+        reverse_iterator(pointer node) : n(node) {};
+        reverse_iterator(const reverse_iterator &it) : n(it.n){};
+        value_type& operator*() const { return *n; }
+
+        reverse_iterator &operator++()
+        {
+            n--;
+            return *this;
+        }
+        reverse_iterator &operator--()
+        {
+            n++;
+            return *this;
+        }
+        reverse_iterator operator++(int)
+        {
+            reverse_iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        iterator operator--(int)
+        {
+            reverse_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const reverse_iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const reverse_iterator &rhs) const { return n != rhs.n; }
+
+        friend class vector::const_reverse_iterator;
+        friend class vector;
+    };
+
+    class const_reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
+    {
+        const pointer n;
+
+      public:
+        const_reverse_iterator() : n(nullptr){};
+        const_reverse_iterator(pointer node) : n(node){};
+        const_reverse_iterator(const const_reverse_iterator &it) : n(it.n){};
+        const_reverse_iterator(const typename vector<value_type>::const_iterator &it) : n(it.n) {};
+        value_type &operator*() const { return n->value; }
+
+        const_reverse_iterator &operator++()
+        {
+            n--;
+            return *this;
+        }
+        const_reverse_iterator &operator--()
+        {
+            n--;
+            return *this;
+        }
+        const_reverse_iterator operator++(int)
+        {
+            const_reverse_iterator tmp(*this);
+            operator++();
+            return tmp;
+        }
+        const_reverse_iterator operator--(int)
+        {
+            const_reverse_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+
+        bool operator==(const const_reverse_iterator &rhs) const { return n == rhs.n; }
+        bool operator!=(const const_reverse_iterator &rhs) const { return n != rhs.n; }
+
+        friend class vector;
+    };
+
+    // Constructors
+    explicit vector(const allocator_type& alloc = allocator_type()) : _contents(nullptr), _count(0), _capacity(0), _growthAdd(4), _alloc(alloc) { }
+    vector(size_type count, const T& value, const allocator_type& alloc = allocator_type()) : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc) { _contents = _alloc.allocate(count); for (int i=0; i < count; i++) { _alloc.construct(&_contents[i], value); } }
+    explicit vector(size_type count, const allocator_type& alloc = allocator_type()) : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc) { _contents = _alloc.allocate(count); }
+    //template< class InputIt >
+    //vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() )
+    vector(const vector& other) : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(other.get_allocator()) { if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); } }
+    vector(const vector& other, const allocator_type & alloc) : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(alloc) { if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); } }
+    vector(vector&& other) : _count(other._count), _capacity(other._count), _growthAdd(other._growthAdd), _alloc(other.get_allocator()) { if (_count > 0) { _contents = other._contents; } other._contents = nullptr; other._capacity = 0; other._size = 0; other._growthAdd = 4; }
+    vector(vector&& other, const allocator_type& alloc) : _count(other._count), _capacity(other._capacity), _growthAdd(other._growthAdd), _alloc(alloc) { if (_alloc == other._alloc) { if (_count > 0) { _contents = other._contents; } other._contents = nullptr; other._capacity = 0; other._size = 0; other._growthAdd = 4; } else {if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); }} }
+    vector(std::initializer_list<value_type> init, const allocator_type& alloc = allocator_type()) : _count(init.size()), _capacity(init.size()), _growthAdd(4), _alloc(alloc) { if (_count > 0) { pointer value = init.begin(); _contents = _alloc.allocate(_count); for (int i=0; i < init.size(); i++) _alloc.construct(&_contents[i], *value++); }}
+    allocator_type get_allocator() const { return _alloc; }
+
+    // Destructor
+    ~vector() { if ((_count > 0) && std::is_pointer<value_type>::value) for (int i=0; i < _count; i++) _alloc.destroy(&_contents[i]); }
+
+    // Element access
+    reference at(size_type pos) { if (pos >= _count) throw std::out_of_range("vector acces out of range"); else return _contents[pos]; }
+    const_reference at(size_type pos) const { if (pos >= _count) throw std::out_of_range("vector acces out of range"); else return _contents[pos]; }
+    reference operator[](size_type pos) { return _contents[pos]; }
+    const_reference operator[](size_type pos) const { return _contents[pos]; }
+    reference front() { return _contents[0]; }
+    const_reference front() const { return _contents[0]; }
+    reference back() { return _contents[_count - 1]; }
+    const_reference back() const { return _contents[_count - 1]; }
+    const pointer data() const noexcept { return _contents; }
+    pointer data() noexcept { return _contents; }
+
+    // Iterators
+    iterator begin() noexcept { if (_count) return iterator(&_contents[0]); else return iterator(nullptr); }
+    const_iterator cbegin() const noexcept { if (_count) return const_iterator(&_contents[0]); else return const_iterator(nullptr); }
+    iterator end() noexcept { if (_count) return iterator(&_contents[_count]); else return iterator(nullptr); }
+    const_iterator cend() const noexcept { if (_count) return const_iterator(&_contents[_count]); else return const_iterator(nullptr); }
+    reverse_iterator rbegin() noexcept { if (_count) return iterator(&_contents[_count-1]); else return iterator(nullptr); }
+    const_iterator crbegin() const noexcept { if (_count) return const_iterator(&_contents[_count-1]); else return const_iterator(nullptr); }
+    iterator rend() noexcept { if (_count) return iterator(&_contents[-1]); else return iterator(nullptr); }
+    const_iterator crend() const noexcept { if (_count) return const_iterator(&_contents[-1]); else return const_iterator(nullptr); }
+
+    // Capacity
+    bool empty() { return 0 == _count; }
+    size_type size() { return _count; }
+    size_type max_size() { return (uintptr_t)-1 / sizeof(value_type); }
+    size_type capacity() { return _capacity; }
+    void shrink_to_fit() {}
+    void reserve(size_type new_cap) { if (new_cap > _capacity) { pointer _p = _alloc.allocate(new_cap); if (_contents != nullptr) { memcpy(_p, _contents, _capacity * sizeof(value_type)); _alloc.deallocate(_count, _capacity); } _contents = _p; _capacity = new_cap;} }
+
+    // Modifiers
+    void clear() { if (_count) { for (int i=0; i < _count; i++) _alloc.destruct(&_contents[i]); _count = 0;} }
+
+private:
+    pointer         _contents;
+    size_type       _count;
+    size_type       _capacity;
+    size_type       _growthAdd;
+    allocator_type  _alloc;
+};
+
+}
+
+#endif // _TINYSTD_VECTOR
