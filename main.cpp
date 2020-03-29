@@ -12,14 +12,16 @@
 
 #include <tinystd/string>
 #include <tinystd/list>
+#include <tinystd/vector>
 
-static const char __attribute__((used)) version[] = "\0$VER: MiniStd " VERSION_STRING;
+static const char __attribute__((used)) version[] = "\0$VER: TinyStd " VERSION_STRING;
 
 int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
 
+    tinystd::vector<int> array;
     tinystd::list<int> list(10, 0);
     tinystd::list<tinystd::string> list2;
     
