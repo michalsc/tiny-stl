@@ -31,9 +31,10 @@ int main(int argc, char **argv)
     list.push_back(20);
     list.test();
 
-    for (auto it=list.begin(); it != list.end(); ++it)
+    for (auto it: list)
+    //for (auto it=list.begin(); it != list.end(); ++it)
     {
-        printf("%d ", *it);
+        printf("%d ", it);
     }
     printf("\n");
 

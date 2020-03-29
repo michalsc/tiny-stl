@@ -3,19 +3,21 @@ include version.mk
 #CXX := /usr/bin/clang++
 CXX ?= /usr/local/bin/g++-8
 CXXFLAGS:= -std=c++11 -Os -Iinclude -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0 
-LDFLAGS := 
+LDFLAGS := Build/libtinystd.a
 
 HOST_CXX := /usr/bin/clang++
 HOST_CXXFLAGS := -Os -std=c++11 -Iinclude
-HOST_LDFLAGS :=
+HOST_LDFLAGS := BuildTest/libtinystd.a
 
 VERSTRING := -DVERSION_STRING='$(VERSION_STRING_DATE)'
 
-OBJS := main.o string.o support.o
+LIB_OBJS := tinystd/string.o
+
+OBJS := main.o support.o
 
 OBJDIR := Build
 
-TESTOBJS := string_test.o string.o list_test.o support.o run_tests.o
+TESTOBJS := tests/string_test.o tests/list_test.o support.o tests/run_tests.o
 
 TESTOBJDIR := BuildTest
 
@@ -31,13 +33,23 @@ test:
 	@make --no-print-directory $(TESTOBJDIR)/MiniStdTest
 	@$(TESTOBJDIR)/MiniStdTest
 
-$(TESTOBJDIR)/MiniStdTest: $(addprefix $(TESTOBJDIR)/, $(TESTOBJS))
+$(TESTOBJDIR)/MiniStdTest: $(addprefix $(TESTOBJDIR)/, $(TESTOBJS)) $(TESTOBJDIR)/libtinystd.a
 	@echo "Building test: $@"
 	@$(HOST_CXX) $(foreach f,$(TESTOBJS),$(TESTOBJDIR)/$(f)) $(HOST_LDFLAGS) -o $@
 
-$(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS))
+$(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS)) $(OBJDIR)/libtinystd.a
 	@echo "Building target: $@"
 	@$(CXX) $(foreach f,$(OBJS),$(OBJDIR)/$(f)) $(LDFLAGS) -o $@
+	@echo "Build completed"
+
+$(OBJDIR)/libtinystd.a: $(addprefix $(OBJDIR)/, $(LIB_OBJS))
+	@echo "Building target: $@"
+	@ar -r $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
+	@echo "Build completed"
+
+$(TESTOBJDIR)/libtinystd.a: $(addprefix $(TESTOBJDIR)/, $(LIB_OBJS))
+	@echo "Building target: $@"
+	@ar -r $@ $(foreach f,$(LIB_OBJS),$(TESTOBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
 
 .PHONY: all clean

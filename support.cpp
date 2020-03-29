@@ -63,33 +63,3 @@ void SetMem(void *dst, int size, char fill)
 {
     memset(dst, (int)fill, size);
 }
-
-int _strcmp_(const char *str1, const char *str2)
-{
-    const char * s1 = str1;
-    const char * s2 = str2;
-    unsigned char c1;
-    unsigned char c2;
-    do {
-        c1 = *s1++;
-        c2 = *s2++;
-
-        if (c1 == 0)
-            break;
-    } while (c1 == c2);
-
-    return static_cast<unsigned char>(c1) - static_cast<unsigned char>(c2);
-}
-
-int _strlen_(const char *str)
-{
-    int len = 0;
-    const char *s = str;
-
-    if (str) {
-        while(*str++ != 0);
-        len = str - s - 1;
-    }
-
-    return len;
-}
