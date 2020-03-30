@@ -70,12 +70,12 @@ $(OBJDIR)/%.d: %.cpp
 $(TESTOBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo "Compiling: $*.cpp"
-	@$(HOST_CXX) -c $(HOST_CXXFLAGS) $< -o $@
+	@$(HOST_CXX) -c $(HOST_CXXFLAGS) $(VERSTRING) $< -o $@
 
 $(TESTOBJDIR)/%.d: %.cpp
 	@mkdir -p $(@D)
 	@set -e; rm -f $@; \
-         $(HOST_CXX) -MM -MT $(basename $@).o $(HOST_CXXFLAGS) $< > $@.$$$$; \
+         $(HOST_CXX) -MM -MT $(basename $@).o $(HOST_CXXFLAGS) $(VERSTRING) $< > $@.$$$$; \
          sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
          rm -f $@.$$$$
 
