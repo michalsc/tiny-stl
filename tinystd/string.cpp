@@ -15,6 +15,11 @@ namespace tinystd {
 
 const char string::_null = 0;
 
+namespace __internal__ {
+    extern const char *__tinystd_version;
+    namespace { static const char __attribute__((used)) *ver = __tinystd_version; }
+}
+
 namespace {
 
 int _strcmp_(const char *str1, const char *str2)
@@ -182,7 +187,7 @@ void string::resize_buffer(int size)
             // round up size
             size = (size + 15) & ~15;
             _buffer = static_cast<char *>(AllocMem(size, MEMF_CLEAR));
-            
+
             if (_buffer)
             {
                 _capacity = size;
@@ -218,7 +223,7 @@ void string::resize(int n, char c)
     {
         if (n >= _capacity)
             resize_buffer(n + 1);
-        
+
         SetMem(_buffer + _length, n - _length, c);
         _length = n;
     }
@@ -239,7 +244,7 @@ string& string::operator+= (const string& str)
 
     if (_capacity - _length < len)
         resize_buffer(_length + len);
-    
+
     CopyMem(str._buffer, _buffer + _length, len);
     _length += len - 1;
 
@@ -252,7 +257,7 @@ string& string::operator+= (const char *str)
 
     if (_capacity - _length < len)
         resize_buffer(_length + len);
-    
+
     CopyMem(str, _buffer + _length, len);
     _length += len - 1;
 
@@ -263,7 +268,7 @@ string& string::operator+= (char c)
 {
     if (_capacity - _length < 2)
         resize_buffer(_length + 2);
-    
+
     _buffer[_length++] = c;
     _buffer[_length] = 0;
 
@@ -293,13 +298,13 @@ string& string::append(const char *s, int n)
     if (s != NULL)
     {
         int len = _strlen_(s);
-        
+
         if (len > n)
             len = n;
 
         if (_length + len >= _capacity)
             resize_buffer(_length + len + 1);
-        
+
         CopyMem(s, _buffer + _length, len);
         _length += len;
     }
@@ -312,7 +317,7 @@ string& string::append(int n, char c)
     {
         if (_length + n >= _capacity)
             resize_buffer(_length + n + 1);
-        
+
         SetMem(_buffer + _length, n, c);
 
         _buffer[_length + n] = 0;
@@ -351,7 +356,7 @@ string& string::assign(const char *s, int n)
     if (s)
     {
         int len = _strlen_(s);
-        
+
         if (len > n)
             len = n;
 
@@ -399,7 +404,7 @@ string& string::insert(int pos, const string& str)
 
     CopyMem(_buffer + pos, _buffer + pos + str._length, _length - pos + 1);
     CopyMem(str._buffer, _buffer + pos, str._length);
-    
+
     _length += str._length;
 
     return *this;
@@ -420,7 +425,7 @@ string& string::insert(int pos, const string& str, int subpos, int sublen)
 
         CopyMem(_buffer + pos, _buffer + pos + sublen, _length - pos + 1);
         CopyMem(str._buffer + subpos, _buffer + pos, sublen);
-        
+
         _length += sublen;
 
     }
@@ -434,7 +439,7 @@ string& string::insert(int pos, const char* s)
     {
         if (pos > _length)
             pos = _length;
-        
+
         int len = _strlen_(s);
 
         if (_length + len + 1 > _capacity)
@@ -442,7 +447,7 @@ string& string::insert(int pos, const char* s)
 
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
         CopyMem(s, _buffer + pos, len);
-        
+
         _length += len;
     }
 
@@ -455,7 +460,7 @@ string& string::insert(int pos, const char* s, int n)
     {
         if (pos > _length)
             pos = _length;
-        
+
         int len = _strlen_(s);
 
         if (len > n)
@@ -466,7 +471,7 @@ string& string::insert(int pos, const char* s, int n)
 
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
         CopyMem(s, _buffer + pos, len);
-        
+
         _length += len;
     }
 
@@ -479,7 +484,7 @@ string& string::insert(int pos, int n, char c)
     {
         if (pos > _length)
             pos = _length;
-        
+
         int len = n;
 
         if (_length + len + 1 > _capacity)
@@ -487,7 +492,7 @@ string& string::insert(int pos, int n, char c)
 
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
         SetMem(_buffer + pos, len, c);
-        
+
         _length += len;
     }
 
@@ -505,18 +510,18 @@ string::iterator string::insert(string::const_iterator p, int n, char c)
 
     if (n)
     {
- 
+
         if (pos > _length)
             pos = _length;
-        
+
         int len = n;
 
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
-        
+
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
         SetMem(_buffer + pos, len, c);
-        
+
         _length += len;
     }
 
@@ -529,7 +534,7 @@ string& string::erase(int pos, int len)
     {
         if (len == npos || pos + len > _length)
             len = _length - pos;
-        
+
         CopyMem(_buffer + pos + len, _buffer + pos, _length - pos - len);
         _length-=len;
         _buffer[_length] = 0;
@@ -565,7 +570,7 @@ int string::copy(char *c, int len, int pos)
     {
         if (pos + len > _length)
             len = _length - pos;
-        
+
         CopyMem(_buffer + pos, c, len);
 
         return len;
@@ -637,7 +642,7 @@ string operator+(const string &lhs, char rhs)
 string operator+(char lhs, const string &rhs)
 {
     string result;
-        
+
     result.resize_buffer(rhs._length + 2);
     result._buffer[0] = lhs;
     CopyMem(rhs._buffer, result._buffer + 1, rhs._length + 1);
@@ -775,10 +780,10 @@ string to_string(int val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -806,10 +811,10 @@ string to_string(long val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -837,10 +842,10 @@ string to_string(long long val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -859,10 +864,10 @@ string to_string(unsigned long long val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -881,10 +886,10 @@ string to_string(unsigned long val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -903,10 +908,10 @@ string to_string(unsigned val)
 
     ++it;
     int cnt = str.rend() - it;
-    
+
     if (cnt > 0)
         str.erase(0, cnt);
-    
+
     return str;
 }
 
@@ -918,4 +923,3 @@ std::ostream &operator<<(std::ostream &os, string const &str)
 }
 
 }
-

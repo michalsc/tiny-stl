@@ -14,8 +14,6 @@
 #include <tinystd/list>
 #include <tinystd/vector>
 
-static const char __attribute__((used)) version[] = "\0$VER: TinyStd " VERSION_STRING;
-
 int main(int argc, char **argv)
 {
     (void)argc;
@@ -24,7 +22,7 @@ int main(int argc, char **argv)
     tinystd::vector<int> array;
     tinystd::list<int> list(10, 0);
     tinystd::list<tinystd::string> list2;
-    
+
     list.test();
     list.push_front(10);
     list.test();
