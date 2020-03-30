@@ -256,10 +256,10 @@ public:
         : _count(init.size()), _capacity(init.size()), _growthAdd(4), _alloc(alloc)
     {
         if (_count > 0) {
-            pointer value = init.begin();
             _contents = _alloc.allocate(_count);
-            for (int i=0; i < init.size(); i++) {
-                _alloc.construct(&_contents[i], *value++);
+            pointer p = _contents;
+            for (auto it: init) {
+                _alloc.construct(p++, it);
             }
         }
     }
