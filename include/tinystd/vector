@@ -46,24 +46,20 @@ public:
         iterator(const iterator &it) : n(it.n){};
         value_type& operator*() const { return *n; }
 
-        iterator &operator++()
-        {
+        iterator &operator++() {
             n++;
             return *this;
         }
-        iterator &operator--()
-        {
+        iterator &operator--() {
             n--;
             return *this;
         }
-        iterator operator++(int)
-        {
+        iterator operator++(int) {
             iterator tmp(*this);
             operator++();
             return tmp;
         }
-        iterator operator--(int)
-        {
+        iterator operator--(int) {
             iterator tmp(*this);
             operator--();
             return tmp;
@@ -87,24 +83,20 @@ public:
         const_iterator(const typename vector<value_type>::iterator &it) : n(it.n) {};
         value_type &operator*() const { return n->value; }
 
-        const_iterator &operator++()
-        {
+        const_iterator &operator++() {
             n++;
             return *this;
         }
-        const_iterator &operator--()
-        {
+        const_iterator &operator--() {
             n--;
             return *this;
         }
-        const_iterator operator++(int)
-        {
+        const_iterator operator++(int) {
             const_iterator tmp(*this);
             operator++();
             return tmp;
         }
-        const_iterator operator--(int)
-        {
+        const_iterator operator--(int) {
             const_iterator tmp(*this);
             operator--();
             return tmp;
@@ -128,24 +120,20 @@ public:
         reverse_iterator(const reverse_iterator &it) : n(it.n){};
         value_type& operator*() const { return *n; }
 
-        reverse_iterator &operator++()
-        {
+        reverse_iterator &operator++() {
             n--;
             return *this;
         }
-        reverse_iterator &operator--()
-        {
+        reverse_iterator &operator--() {
             n++;
             return *this;
         }
-        reverse_iterator operator++(int)
-        {
+        reverse_iterator operator++(int) {
             reverse_iterator tmp(*this);
             operator++();
             return tmp;
         }
-        iterator operator--(int)
-        {
+        iterator operator--(int) {
             reverse_iterator tmp(*this);
             operator--();
             return tmp;
@@ -169,24 +157,20 @@ public:
         const_reverse_iterator(const typename vector<value_type>::const_iterator &it) : n(it.n) {};
         value_type &operator*() const { return n->value; }
 
-        const_reverse_iterator &operator++()
-        {
+        const_reverse_iterator &operator++() {
             n--;
             return *this;
         }
-        const_reverse_iterator &operator--()
-        {
+        const_reverse_iterator &operator--() {
             n--;
             return *this;
         }
-        const_reverse_iterator operator++(int)
-        {
+        const_reverse_iterator operator++(int) {
             const_reverse_iterator tmp(*this);
             operator++();
             return tmp;
         }
-        const_reverse_iterator operator--(int)
-        {
+        const_reverse_iterator operator--(int) {
             const_reverse_iterator tmp(*this);
             operator--();
             return tmp;
@@ -199,24 +183,120 @@ public:
     };
 
     // Constructors
-    explicit vector(const allocator_type& alloc = allocator_type()) : _contents(nullptr), _count(0), _capacity(0), _growthAdd(4), _alloc(alloc) { }
-    vector(size_type count, const T& value, const allocator_type& alloc = allocator_type()) : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc) { _contents = _alloc.allocate(count); for (int i=0; i < count; i++) { _alloc.construct(&_contents[i], value); } }
-    explicit vector(size_type count, const allocator_type& alloc = allocator_type()) : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc) { _contents = _alloc.allocate(count); }
+    explicit vector(const allocator_type& alloc = allocator_type())
+        : _contents(nullptr), _count(0), _capacity(0), _growthAdd(4), _alloc(alloc) { }
+    vector(size_type count, const T& value, const allocator_type& alloc = allocator_type())
+        : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc)
+    {
+        _contents = _alloc.allocate(count);
+        for (int i=0; i < count; i++) {
+            _alloc.construct(&_contents[i], value);
+        }
+    }
+    explicit vector(size_type count, const allocator_type& alloc = allocator_type())
+        : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc)
+    {
+        _contents = _alloc.allocate(count);
+    }
     //template< class InputIt >
     //vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() )
-    vector(const vector& other) : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(other.get_allocator()) { if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); } }
-    vector(const vector& other, const allocator_type & alloc) : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(alloc) { if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); } }
-    vector(vector&& other) : _count(other._count), _capacity(other._count), _growthAdd(other._growthAdd), _alloc(other.get_allocator()) { if (_count > 0) { _contents = other._contents; } other._contents = nullptr; other._capacity = 0; other._size = 0; other._growthAdd = 4; }
-    vector(vector&& other, const allocator_type& alloc) : _count(other._count), _capacity(other._capacity), _growthAdd(other._growthAdd), _alloc(alloc) { if (_alloc == other._alloc) { if (_count > 0) { _contents = other._contents; } other._contents = nullptr; other._capacity = 0; other._size = 0; other._growthAdd = 4; } else {if (_count > 0) { _contents = _alloc.allocate(_count); for (int i=0; i < _count; i++) _contents[i] = value_type(other._contents[i]); }} }
-    vector(std::initializer_list<value_type> init, const allocator_type& alloc = allocator_type()) : _count(init.size()), _capacity(init.size()), _growthAdd(4), _alloc(alloc) { if (_count > 0) { pointer value = init.begin(); _contents = _alloc.allocate(_count); for (int i=0; i < init.size(); i++) _alloc.construct(&_contents[i], *value++); }}
+    vector(const vector& other)
+        : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(other.get_allocator())
+    {
+        if (_count > 0) {
+            _contents = _alloc.allocate(_count);
+            for (int i=0; i < _count; i++) {
+                _contents[i] = value_type(other._contents[i]);
+            }
+        }
+    }
+    vector(const vector& other, const allocator_type & alloc)
+        : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(alloc)
+    {
+        if (_count > 0) {
+            _contents = _alloc.allocate(_count);
+            for (int i=0; i < _count; i++) {
+                _contents[i] = value_type(other._contents[i]);
+            }
+        }
+    }
+    vector(vector&& other)
+        : _count(other._count), _capacity(other._count), _growthAdd(other._growthAdd), _alloc(other.get_allocator())
+    {
+        if (_count > 0) {
+            _contents = other._contents;
+        }
+        other._contents = nullptr;
+        other._capacity = 0;
+        other._size = 0;
+        other._growthAdd = 4;
+    }
+    vector(vector&& other, const allocator_type& alloc)
+        : _count(other._count), _capacity(other._capacity), _growthAdd(other._growthAdd), _alloc(alloc)
+    {
+        if (_alloc == other._alloc) {
+            if (_count > 0) {
+                _contents = other._contents;
+            }
+            other._contents = nullptr;
+            other._capacity = 0;
+            other._size = 0;
+            other._growthAdd = 4;
+        }
+        else {
+            if (_count > 0) {
+                _contents = _alloc.allocate(_count);
+                for (int i=0; i < _count; i++) {
+                    _contents[i] = value_type(other._contents[i]);
+                }
+            }
+        }
+    }
+    vector(std::initializer_list<value_type> init, const allocator_type& alloc = allocator_type())
+        : _count(init.size()), _capacity(init.size()), _growthAdd(4), _alloc(alloc)
+    {
+        if (_count > 0) {
+            pointer value = init.begin();
+            _contents = _alloc.allocate(_count);
+            for (int i=0; i < init.size(); i++) {
+                _alloc.construct(&_contents[i], *value++);
+            }
+        }
+    }
     allocator_type get_allocator() const { return _alloc; }
 
     // Destructor
-    ~vector() { if ((_count > 0) && std::is_pointer<value_type>::value) for (int i=0; i < _count; i++) _alloc.destroy(&_contents[i]); }
+    ~vector()
+    {
+        if (_count > 0) {
+            if (std::is_pointer<value_type>::value) {
+                for (int i=0; i < _count; i++) {
+                    _alloc.destroy(&_contents[i]);
+                }
+            }
+            _alloc.deallocate(_contents, _count);
+        }
+    }
 
     // Element access
-    reference at(size_type pos) { if (pos >= _count) throw std::out_of_range("vector acces out of range"); else return _contents[pos]; }
-    const_reference at(size_type pos) const { if (pos >= _count) throw std::out_of_range("vector acces out of range"); else return _contents[pos]; }
+    reference at(size_type pos)
+    {
+        if (pos >= _count) {
+            throw std::out_of_range("tinystd::vector::at() out of range");
+        }
+        else {
+            return _contents[pos];
+        }
+    }
+    const_reference at(size_type pos) const
+    {
+        if (pos >= _count) {
+            throw std::out_of_range("tinystd::vector::at() out of range");
+        }
+        else {
+            return _contents[pos];
+        }
+    }
     reference operator[](size_type pos) { return _contents[pos]; }
     const_reference operator[](size_type pos) const { return _contents[pos]; }
     reference front() { return _contents[0]; }
@@ -242,10 +322,30 @@ public:
     size_type max_size() { return (uintptr_t)-1 / sizeof(value_type); }
     size_type capacity() { return _capacity; }
     void shrink_to_fit() {}
-    void reserve(size_type new_cap) { if (new_cap > _capacity) { pointer _p = _alloc.allocate(new_cap); if (_contents != nullptr) { memcpy(_p, _contents, _capacity * sizeof(value_type)); _alloc.deallocate(_count, _capacity); } _contents = _p; _capacity = new_cap;} }
+    void reserve(size_type new_cap)
+    {
+        if (new_cap > _capacity)
+        {
+            pointer _p = _alloc.allocate(new_cap);
+            if (_contents != nullptr) {
+                memcpy(_p, _contents, _count * sizeof(value_type));
+                _alloc.deallocate(_count, _capacity);
+            }
+            _contents = _p;
+            _capacity = new_cap;
+        }
+    }
 
     // Modifiers
-    void clear() { if (_count) { for (int i=0; i < _count; i++) _alloc.destruct(&_contents[i]); _count = 0;} }
+    void clear()
+    {
+        if (_count) {
+            for (int i=0; i < _count; i++) {
+                _alloc.destruct(&_contents[i]);
+            }
+            _count = 0;
+        }
+    }
 
 private:
     pointer         _contents;
