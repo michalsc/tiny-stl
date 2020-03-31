@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tinystd/bits/support.h>
+#include <tinystl/bits/support.h>
 
 void * AllocMem(int size, int type)
 {

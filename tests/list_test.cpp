@@ -1,5 +1,5 @@
-#include <tinystd/list>
-#include <tinystd/string>
+#include <tinystl/list>
+#include <tinystl/string>
 #include "catch.hpp"
 
 // a predicate implemented as a function:
@@ -27,7 +27,7 @@ bool compare_nocase (tinystd::string& first, tinystd::string& second)
 bool mycomparison (double first, double second)
 { return ( int(first)<int(second) ); }
 
-TEST_CASE("tinystd::list class", "[tinystd::list]") {
+TEST_CASE("tinystl::list class", "[tinystl::list]") {
 
     SECTION("Constructors") {
         tinystd::list<int> first;                                // empty list of ints

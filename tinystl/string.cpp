@@ -7,8 +7,9 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <tinystd/string>
-#include <tinystd/bits/support.h>
+#include <tinystl/allocator>
+#include <tinystl/string>
+#include <tinystl/bits/support.h>
 #include <ostream>
 
 namespace tinystd {
@@ -174,10 +175,10 @@ void string::resize_buffer(int size)
             // if size is larger than string length, allow to realloc
             if (size > (_capacity))
             {
-                void * new_buff = AllocMem(size, MEMF_CLEAR);
+                char * new_buff = allocator<char>().allocate(size);
                 CopyMem(_buffer, new_buff, _capacity);
-                FreeMem(_buffer, _capacity);
-                _buffer = static_cast<char *>(new_buff);
+                allocator<char>().deallocate(_buffer, _capacity);
+                _buffer = new_buff;
                 _capacity = size;
             }
         }
@@ -186,7 +187,7 @@ void string::resize_buffer(int size)
             // Buffer was not allocated, get it now
             // round up size
             size = (size + 15) & ~15;
-            _buffer = static_cast<char *>(AllocMem(size, MEMF_CLEAR));
+            _buffer = allocator<char>().allocate(size);
 
             if (_buffer)
             {
@@ -200,7 +201,7 @@ void string::resize_buffer(int size)
         _length = 0;
         if (_buffer != NULL)
         {
-            FreeMem(_buffer, _capacity);
+            allocator<char>().deallocate(_buffer, _capacity);
             _buffer = NULL;
             _capacity = 0;
         }

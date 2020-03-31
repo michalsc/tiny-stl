@@ -17,7 +17,7 @@ OBJS := main.o support.o
 
 OBJDIR := Build
 
-TESTOBJS := tests/string_test.o tests/list_test.o support.o tests/run_tests.o
+TESTOBJS := tests/string_test.o tests/list_test.o tests/vector_test.o support.o tests/run_tests.o
 
 TESTOBJDIR := BuildTest
 

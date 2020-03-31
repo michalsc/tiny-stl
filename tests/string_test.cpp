@@ -7,10 +7,10 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <tinystd/string>
+#include <tinystl/string>
 #include "catch.hpp"
 
-TEST_CASE("tinystd::string class", "[tinystd::string]") {
+TEST_CASE("tinystl::string class", "[tinystl::string]") {
 
     SECTION("Constructors are working") {
         tinystd::string s0("Initial string");

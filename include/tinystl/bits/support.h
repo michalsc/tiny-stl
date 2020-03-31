@@ -11,6 +11,9 @@
 #ifndef _TINYSTD_BITS_SUPPORT_H
 #define _TINYSTD_BITS_SUPPORT_H
 
+#include <type_traits>
+#include <iterator>
+
 #define MEMF_ANY    1
 #define MEMF_CLEAR  2
 
