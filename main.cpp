@@ -23,11 +23,8 @@ int main(int argc, char **argv)
     tinystd::list<int> list(10, 0);
     tinystd::list<tinystd::string> list2;
 
-    list.test();
     list.push_front(10);
-    list.test();
     list.push_back(20);
-    list.test();
 
     for (auto it: list)
     {
