@@ -1,10 +1,12 @@
 include version.mk
 
 #CXX := /usr/bin/clang++
+AR ?= ar
 CXX ?= /usr/local/bin/g++-8
 CXXFLAGS?= -std=c++11 -Os -Iinclude -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0
 LDFLAGS := Build/libtinystl.a
 
+HOST_AR := ar
 HOST_CXX := /usr/bin/clang++
 HOST_CXXFLAGS := -Os -std=c++11 -Iinclude
 HOST_LDFLAGS := BuildTest/libtinystl.a
@@ -48,12 +50,12 @@ $(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS)) $(OBJDIR)/libtinystl.a
 
 $(OBJDIR)/libtinystl.a: $(addprefix $(OBJDIR)/, $(LIB_OBJS))
 	@echo "Building target: $@"
-	@ar -rs $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
+	@$(AR) -rs $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
 
 $(TESTOBJDIR)/libtinystl.a: $(addprefix $(TESTOBJDIR)/, $(LIB_OBJS))
 	@echo "Building target: $@"
-	@ar -r $@ $(foreach f,$(LIB_OBJS),$(TESTOBJDIR)/$(f)) 2>/dev/null
+	@$(HOST_AR) -rs $@ $(foreach f,$(LIB_OBJS),$(TESTOBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
 
 .PHONY: all clean
