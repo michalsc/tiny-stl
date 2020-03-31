@@ -36,7 +36,7 @@ namespace tinystd {
 // string to_string(float val);
 // string to_string(double val);
 // string to_string(void *val);
-// 
+//
 // int stoi(const string& str, int * idx = 0, int base = 10);
 // long int stol(const string& str, int * idx = 0, int base = 10);
 // unsigned long stoul(const string& str, int * idx = 0, int base = 10);
@@ -48,7 +48,7 @@ namespace tinystd {
 class string {
 public:
     class const_iterator;
-    // Random access iterator with tiny bit of safety - it cannot go beyond 
+    // Random access iterator with tiny bit of safety - it cannot go beyond
     // given boundaries.
     class iterator : public std::iterator<std::random_access_iterator_tag, char> {
         char *p;
@@ -70,7 +70,7 @@ public:
         iterator operator+(difference_type rhs) const { return iterator(p + rhs); }
         iterator operator-(difference_type rhs) const { return iterator(p - rhs); }
         friend inline iterator operator+(difference_type lhs, const iterator &rhs) { return iterator(lhs + rhs.p); }
-        
+
         bool operator==(const iterator& rhs) const { return p == rhs.p; }
         bool operator!=(const iterator& rhs) const { return p != rhs.p; }
         bool operator>(const iterator& rhs) const { return p > rhs.p; }
@@ -80,7 +80,7 @@ public:
 
         friend class string::const_iterator;
     };
-    
+
     class const_iterator : public std::iterator<std::random_access_iterator_tag, char> {
         const char *p;
     public:
@@ -102,7 +102,7 @@ public:
         const_iterator operator+(difference_type rhs) const { return const_iterator(p + rhs); }
         const_iterator operator-(difference_type rhs) const { return const_iterator(p - rhs); }
         friend inline iterator operator+(difference_type lhs, const const_iterator &rhs) { return const_iterator(lhs + rhs.p); }
-        
+
         bool operator==(const const_iterator& rhs) const { return p == rhs.p; }
         bool operator!=(const const_iterator& rhs) const { return p != rhs.p; }
         bool operator>(const const_iterator& rhs) const { return p > rhs.p; }
@@ -110,8 +110,8 @@ public:
         bool operator<(const const_iterator &rhs) const { return p < rhs.p; }
         bool operator<=(const const_iterator &rhs) const { return p <= rhs.p; }
     };
-    
-    // Random access reverse iterator with tiny bit of safety - it cannot go beyond 
+
+    // Random access reverse iterator with tiny bit of safety - it cannot go beyond
     // given boundaries.
     class reverse_iterator : public std::iterator<std::bidirectional_iterator_tag, char> {
         char *p;
@@ -185,7 +185,7 @@ public:
     // Element access
     char& operator[] (int pos) { if (pos >= 0 && pos < _length) return _buffer[pos]; else return (char&)_null; }
     char& at(int pos) { if (pos >= 0 && pos < _length) return _buffer[pos]; else return (char&)_null; }
-    
+
     // Modifiers
     string& operator+= (const string& str);
     string& operator+= (const char* s);
@@ -241,7 +241,7 @@ public:
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
         CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        for (char *b = _buffer + pos; it != last; ++it) *b++ = *it; 
+        for (char *b = _buffer + pos; it != last; ++it) *b++ = *it;
         _length += len;
         return iterator(_buffer + pos);
     }

@@ -198,7 +198,7 @@ public:
     {
         _contents = _alloc.allocate(count);
     }
-    template< typename InputIt, 
+    template< typename InputIt,
               typename = std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
     vector( InputIt first, InputIt last, const allocator_type& alloc = allocator_type() ) : _alloc(alloc), _growthAdd(4)
     {
@@ -517,6 +517,8 @@ public:
     }
 
 private:
+    void _expand_capacity(size_type required);
+
     pointer         _contents;
     size_type       _count;
     size_type       _capacity;
