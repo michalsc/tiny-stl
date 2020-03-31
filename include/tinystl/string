@@ -13,7 +13,8 @@
 
 #include <ostream>
 #include <iterator>
-#include <tinystd/bits/support.h>
+#include <tinystl/allocator>
+#include <tinystl/bits/support.h>
 
 namespace tinystd {
 

@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <iostream>
 
-#include <tinystd/string>
-#include <tinystd/list>
-#include <tinystd/vector>
+#include <tinystl/string>
+#include <tinystl/list>
+#include <tinystl/vector>
 
 int main(int argc, char **argv)
 {

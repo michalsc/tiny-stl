@@ -3,21 +3,21 @@ include version.mk
 #CXX := /usr/bin/clang++
 CXX ?= /usr/local/bin/g++-8
 CXXFLAGS:= -std=c++11 -Os -Iinclude -pedantic -pedantic-errors -Wall -Wextra -Werror -c -fmessage-length=0
-LDFLAGS := Build/libtinystd.a
+LDFLAGS := Build/libtinystl.a
 
 HOST_CXX := /usr/bin/clang++
 HOST_CXXFLAGS := -Os -std=c++11 -Iinclude
-HOST_LDFLAGS := BuildTest/libtinystd.a
+HOST_LDFLAGS := BuildTest/libtinystl.a
 
 VERSTRING := -DVERSION_STRING='$(VERSION_STRING_DATE)'
 
-LIB_OBJS := tinystd/version.o tinystd/string.o
+LIB_OBJS := tinystl/version.o tinystl/string.o
 
 OBJS := main.o support.o
 
 OBJDIR := Build
 
-TESTOBJS := tests/string_test.o tests/list_test.o support.o tests/run_tests.o
+TESTOBJS := tests/string_test.o tests/list_test.o tests/vector_test.o support.o tests/run_tests.o
 
 TESTOBJDIR := BuildTest
 
@@ -33,21 +33,21 @@ test:
 	@make --no-print-directory $(TESTOBJDIR)/MiniStdTest
 	@$(TESTOBJDIR)/MiniStdTest
 
-$(TESTOBJDIR)/MiniStdTest: $(addprefix $(TESTOBJDIR)/, $(TESTOBJS)) $(TESTOBJDIR)/libtinystd.a
+$(TESTOBJDIR)/MiniStdTest: $(addprefix $(TESTOBJDIR)/, $(TESTOBJS)) $(TESTOBJDIR)/libtinystl.a
 	@echo "Building test: $@"
 	@$(HOST_CXX) $(foreach f,$(TESTOBJS),$(TESTOBJDIR)/$(f)) $(HOST_LDFLAGS) -o $@
 
-$(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS)) $(OBJDIR)/libtinystd.a
+$(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS)) $(OBJDIR)/libtinystl.a
 	@echo "Building target: $@"
 	@$(CXX) $(foreach f,$(OBJS),$(OBJDIR)/$(f)) $(LDFLAGS) -o $@
 	@echo "Build completed"
 
-$(OBJDIR)/libtinystd.a: $(addprefix $(OBJDIR)/, $(LIB_OBJS))
+$(OBJDIR)/libtinystl.a: $(addprefix $(OBJDIR)/, $(LIB_OBJS))
 	@echo "Building target: $@"
 	@ar -r $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
 
-$(TESTOBJDIR)/libtinystd.a: $(addprefix $(TESTOBJDIR)/, $(LIB_OBJS))
+$(TESTOBJDIR)/libtinystl.a: $(addprefix $(TESTOBJDIR)/, $(LIB_OBJS))
 	@echo "Building target: $@"
 	@ar -r $@ $(foreach f,$(LIB_OBJS),$(TESTOBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
