@@ -30,7 +30,6 @@ int main(int argc, char **argv)
     list.test();
 
     for (auto it: list)
-    //for (auto it=list.begin(); it != list.end(); ++it)
     {
         printf("%d ", it);
     }
