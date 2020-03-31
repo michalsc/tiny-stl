@@ -19,7 +19,7 @@
 namespace tinystd {
 
 namespace {
-    
+
     template <class T>
     struct node {
         node    *succ;
@@ -43,7 +43,7 @@ namespace {
         typedef const value_type*   const_pointer;
         typedef uintptr_t           size_type;
         typedef ptrdiff_t           difference_type;
-        
+
         node_allocator() : alloc() {}
         node_allocator(const node_allocator&) : node_allocator() {}
         ~node_allocator() {}
@@ -84,7 +84,7 @@ public:
     typedef const value_type&       const_reference;
     typedef value_type*             pointer;
     typedef const value_type*       const_pointer;
-    typedef intptr_t                size_type;
+    typedef uintptr_t               size_type;
     typedef node_allocator<T>       allocator_type;
 
     class const_iterator;
@@ -224,7 +224,7 @@ public:
     ~list() { clear(); }
     list(const list& x) : count(0) { alloc = allocator_type(x.alloc); node<value_type> *n = x._list.getHead(); while(n) { push_back(n->value); n = n->getSucc(); } }
     list& operator= (const list& x) { clear(); node<value_type> *n = x._list.getHead(); while(n) { push_back(n->value); n = n->getSucc(); } return *this; }
-    
+
     // Iterators
     iterator begin() { return iterator(_list.listHead.succ); }
     iterator end() { return iterator(&_list.listTail); }
@@ -285,13 +285,13 @@ public:
     iterator insert(iterator position, const value_type& val) {
         node<value_type> *n = alloc.allocate(1);
         alloc.construct(n, val);
-        
+
         n->succ = position.n->succ;
         n->pred = position.n;
 
         n->succ->pred = n;
         n->pred->succ = n;
-        
+
         count++;
 
         return iterator(n);
@@ -498,7 +498,7 @@ public:
             if (n->value < no->value) {
                 n->pred = &_list.listHead;
                 n->succ = _list.listHead.succ;
-            
+
                 _list.listHead.succ->pred = n;
                 _list.listHead.succ = n;
             } else {
@@ -525,7 +525,7 @@ public:
                 if (n->value < no->value) {
                     n->pred = &l.listHead;
                     n->succ = l.listHead.succ;
-                
+
                     l.listHead.succ->pred = n;
                     l.listHead.succ = n;
                 } else {
@@ -553,7 +553,7 @@ public:
                 if (comp(n->value, no->value)) {
                     n->pred = &l.listHead;
                     n->succ = l.listHead.succ;
-                
+
                     l.listHead.succ->pred = n;
                     l.listHead.succ = n;
                 } else {
@@ -576,22 +576,6 @@ public:
 
         while((n = _list.remHead())) l.addHead(n);
         while((n = l.remHead())) _list.addTail(n);
-    }
-    void test() {
-        node<value_type> *n = _list.getHead();
-        printf("list=%p, head=%p, head.succ=%p, tail=%p, tail.pred=%p\n",
-               (void *)&_list, (void *)(&_list.listHead), (void*)_list.listHead.succ, (void *)(&_list.listTail), (void *)(_list.listTail.pred));
-        printf("  HEAD @ %p. Head->succ=%p Head->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
-
-        n = n->getSucc();
-        while(n != _list.getTail())
-        {
-            printf("  node @ %p. node->succ=%p node->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
-            n = n->getSucc();
-        }
-
-        n = _list.getTail();
-        printf("  TAIL @ %p. Tail->succ=%p Tail->pred=%p\n", (void *)n, (void *)(n->succ), (void *)(n->pred));
     }
 private:
     minlist<T>          _list;
