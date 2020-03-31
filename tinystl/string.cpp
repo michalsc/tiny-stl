@@ -10,7 +10,6 @@
 #include <tinystl/allocator>
 #include <tinystl/string>
 #include <tinystl/bits/support.h>
-#include <ostream>
 
 namespace tinystd {
 
@@ -914,13 +913,6 @@ string to_string(unsigned val)
         str.erase(0, cnt);
 
     return str;
-}
-
-std::ostream &operator<<(std::ostream &os, string const &str)
-{
-    os << "\"" << str.c_str() << "\"";
-
-    return os;
 }
 
 }
