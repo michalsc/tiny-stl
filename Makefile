@@ -48,7 +48,7 @@ $(OBJDIR)/MiniStd: $(addprefix $(OBJDIR)/, $(OBJS)) $(OBJDIR)/libtinystl.a
 
 $(OBJDIR)/libtinystl.a: $(addprefix $(OBJDIR)/, $(LIB_OBJS))
 	@echo "Building target: $@"
-	@ar -r $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
+	@ar -rs $@ $(foreach f,$(LIB_OBJS),$(OBJDIR)/$(f)) 2>/dev/null
 	@echo "Build completed"
 
 $(TESTOBJDIR)/libtinystl.a: $(addprefix $(TESTOBJDIR)/, $(LIB_OBJS))
