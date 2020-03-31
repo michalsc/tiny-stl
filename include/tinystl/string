@@ -11,7 +11,6 @@
 #ifndef _TINYSTD_STRING
 #define _TINYSTD_STRING
 
-#include <ostream>
 #include <iterator>
 #include <tinystl/allocator>
 #include <tinystl/bits/support.h>
@@ -348,9 +347,6 @@ long long stoll(const string& str, int * idx = 0, int base = 10);
 unsigned long long stoull(const string& str, int * idx = 0, int base = 10);
 float stof(const string& str, int * idx = 0);
 double stod(const string& str, int * idx = 0);
-
-// To be removed when used as standalone
-std::ostream &operator<<(std::ostream &os, string const &str);
 
 }
 
