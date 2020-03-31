@@ -456,7 +456,7 @@ public:
     const_reference front() const { return _contents[0]; }
     reference back() { return _contents[_count - 1]; }
     const_reference back() const { return _contents[_count - 1]; }
-    const pointer data() const noexcept { return _contents; }
+    const_pointer data() const noexcept { return _contents; }
     pointer data() noexcept { return _contents; }
 
     // Iterators
