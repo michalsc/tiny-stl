@@ -15,8 +15,6 @@
 #include <typeinfo>
 #include <tinystl/bits/support.h>
 
-#define D(x) /* x */
-
 namespace tinystd {
 
 template <class T>
