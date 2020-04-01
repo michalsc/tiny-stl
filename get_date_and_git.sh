@@ -1,7 +1,5 @@
 #!/bin/sh
 
->&2 echo `pwd`
-
 BUILD_DATE=`date +"%d.%m.%Y"`
 GIT_HEAD=`git rev-parse --short HEAD`
 
