@@ -14,9 +14,8 @@ add_library(tinystl STATIC
 )
 target_include_directories(tinystl PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-add_subdirectory(example)
-
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_subdirectory(example)
     include(CTest)
     if (BUILD_TESTING)
         add_subdirectory(test)
