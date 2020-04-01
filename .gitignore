@@ -1,7 +1,5 @@
-/Debug/
-/Release/
-/Build/
-/BuildTest/
+/build/
+/buildtest/
 /VERSIONINFO
 /VERSIONINFO.OLD
 /version.h

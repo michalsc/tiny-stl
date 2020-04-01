@@ -7,8 +7,10 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <tinystl/string>
+#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+
+#include <tinystl/string>
 
 TEST_CASE("tinystl::string class", "[tinystl::string]") {
 

@@ -1,6 +1,17 @@
+/*
+    Copyright © 2020 Michal Schulz <michal.schulz@gmx.de>
+    https://github.com/michalsc
+
+    This Source Code Form is subject to the terms of the
+    Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
+    with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+
 #include <tinystl/list>
 #include <tinystl/string>
-#include "catch.hpp"
 
 // a predicate implemented as a function:
 bool single_digit (const int& value) { return (value<10); }
@@ -33,7 +44,7 @@ TEST_CASE("tinystl::list class", "[tinystl::list]") {
         tinystd::list<int> first;                                // empty list of ints
         tinystd::list<int> second (4,100);                       // four ints with value 100
         tinystd::list<int> third (second.begin(),second.end());  // iterating through second
-        tinystd::list<int> fourth (third); 
+        tinystd::list<int> fourth (third);
 
         // the iterator constructor can also be used to construct from arrays:
         int myints[] = {16,2,77,29};
@@ -71,7 +82,7 @@ TEST_CASE("tinystl::list class", "[tinystl::list]") {
     SECTION("Iterators") {
         int myints[] = {75,23,65,42,13};
         tinystd::list<int> mylist (myints,myints+5);
-        
+
         int i=0;
         for (tinystd::list<int>::iterator it = mylist.begin(); it != mylist.end(); ++it)
         {
@@ -310,7 +321,7 @@ TEST_CASE("tinystl::list class", "[tinystl::list]") {
 
             const char *list[] = { "Three", "one", "two" };
             int i=0;
-            
+
             for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
                 CHECK( *it == list[i] );
             }
@@ -319,7 +330,7 @@ TEST_CASE("tinystl::list class", "[tinystl::list]") {
 
             const char *list_2[] = { "one", "Three", "two" };
             i=0;
-            
+
             for (it=mylist.begin(); it!=mylist.end(); ++it,++i) {
                 CHECK( *it == list_2[i] );
             }
