@@ -118,20 +118,21 @@ public:
         reverse_iterator() : p(nullptr) {};
         reverse_iterator(char *ptr) : p(ptr) {};
         reverse_iterator(const reverse_iterator& it) : p(it.p) {};
-        iterator& operator+=(difference_type rhs) { p -= rhs; return *this; }
-        iterator& operator-=(difference_type rhs) { p += rhs; return *this; }
+        reverse_iterator& operator=(const reverse_iterator& it) { p = it.p; return *this; }
+        reverse_iterator& operator+=(difference_type rhs) { p -= rhs; return *this; }
+        reverse_iterator& operator-=(difference_type rhs) { p += rhs; return *this; }
         char& operator*() const { return *p; }
         char* operator->() const { return p; }
         char& operator[](difference_type rhs) const { return p[-rhs]; }
 
-        iterator& operator++() { --p; return *this; }
-        iterator& operator--() { ++p; return *this; }
-        iterator operator++(int) { reverse_iterator tmp(*this); operator++(); return std::move(tmp); }
-        iterator operator--(int) { reverse_iterator tmp(*this); operator--(); return std::move(tmp); }
+        reverse_iterator& operator++() { --p; return *this; }
+        reverse_iterator& operator--() { ++p; return *this; }
+        reverse_iterator operator++(int) { reverse_iterator tmp(*this); operator++(); return tmp; }
+        reverse_iterator operator--(int) { reverse_iterator tmp(*this); operator--(); return tmp; }
         difference_type operator-(const reverse_iterator &rhs) const { return (rhs.p - p); }
-        iterator operator+(difference_type rhs) const { return reverse_iterator(p - rhs); }
-        iterator operator-(difference_type rhs) const { return reverse_iterator(p + rhs); }
-        friend inline iterator operator+(difference_type lhs, const reverse_iterator &rhs) { return reverse_iterator(rhs.p - lhs); }
+        reverse_iterator operator+(difference_type rhs) const { return reverse_iterator(p - rhs); }
+        reverse_iterator operator-(difference_type rhs) const { return reverse_iterator(p + rhs); }
+        friend inline reverse_iterator operator+(difference_type lhs, const reverse_iterator &rhs) { return reverse_iterator(rhs.p - lhs); }
 
         bool operator==(const reverse_iterator& rhs) const { return p==rhs.p; }
         bool operator!=(const reverse_iterator& rhs) const { return p!=rhs.p; }
