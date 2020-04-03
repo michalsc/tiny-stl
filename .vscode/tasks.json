@@ -54,7 +54,7 @@
             }
         },
         {
-            "taskName": "Build test",
+            "taskName": "Run test",
             "suppressTaskName": true,
             "isBuildCommand": true,
             "args": [
