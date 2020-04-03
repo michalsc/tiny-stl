@@ -160,5 +160,9 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
         CHECK( *fruits.begin() == "orange" );
 
         CHECK( empty.begin() == empty.end() );
+
+        for (int i=0; i < ints.size(); i++) {
+            CHECK( ints[i] == rints[rints.size() - i - 1] );
+        }
     }
 }
