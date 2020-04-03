@@ -30,7 +30,7 @@ public:
     typedef const value_type&       const_reference;
     typedef value_type*             pointer;
     typedef const value_type*       const_pointer;
-    typedef uintptr_t                size_type;
+    typedef uintptr_t               size_type;
     typedef ptrdiff_t               difference_type;
 
 private:
@@ -49,6 +49,20 @@ public:
         iterator(pointer node) : n(node) {};
         iterator(const iterator &it) : n(it.n){};
         value_type& operator*() const { return *n; }
+
+        iterator& operator+=(difference_type pos) { n += pos; return *this; }
+        iterator& operator-=(difference_type pos) { n -= pos; return *this; }
+        iterator operator+(difference_type pos) { iterator tmp(*this); tmp+=pos; return tmp; }
+        iterator operator-(difference_type pos) { iterator tmp(*this); tmp-=pos; return tmp; }
+        friend inline iterator operator+(const difference_type pos, const iterator& rhs) { iterator(tmp); tmp+=pos; return tmp; }
+        friend inline iterator operator-(const difference_type pos, const iterator& rhs) { iterator(tmp); tmp-=pos; return tmp; }
+        friend inline difference_type operator-(const iterator& rhs, const iterator& lhs) { return lhs.n - rhs.n; }
+        difference_type operator-(const iterator& rhs) { return n - rhs.n; }
+        bool operator<(const iterator &rhs) { return rhs.n > n; }
+        bool operator<=(const iterator &rhs) { return rhs.n >= n; }
+        bool operator>(const iterator &rhs) { return rhs.n < n; }
+        bool operator>=(const iterator &rhs) { return rhs.n <= n; }
+        value_type& operator[](difference_type pos) { return *(n+pos); }
 
         iterator &operator++() {
             n++;
@@ -87,6 +101,20 @@ public:
         const_iterator(const typename vector<value_type>::iterator &it) : n(it.n) {};
         value_type &operator*() const { return *n; }
 
+        const_iterator& operator+=(difference_type pos) { n += pos; return *this; }
+        const_iterator& operator-=(difference_type pos) { n -= pos; return *this; }
+        const_iterator operator+(difference_type pos) { const_iterator tmp(*this); tmp+=pos; return tmp; }
+        const_iterator operator-(difference_type pos) { const_iterator tmp(*this); tmp-=pos; return tmp; }
+        friend inline const_iterator operator+(const difference_type pos, const const_iterator& rhs) { const_iterator(tmp); tmp+=pos; return tmp; }
+        friend inline const_iterator operator-(const difference_type pos, const const_iterator& rhs) { const_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline difference_type operator-(const const_iterator& rhs, const const_iterator& lhs) { return lhs.n - rhs.n; }
+        difference_type operator-(const const_iterator& rhs) { return n - rhs.n; }
+        bool operator<(const iterator &rhs) { return rhs.n > n; }
+        bool operator<=(const iterator &rhs) { return rhs.n >= n; }
+        bool operator>(const iterator &rhs) { return rhs.n < n; }
+        bool operator>=(const iterator &rhs) { return rhs.n <= n; }
+        value_type& operator[](difference_type pos) { return *(n+pos); }
+
         const_iterator &operator++() {
             n++;
             return *this;
@@ -122,7 +150,21 @@ public:
         reverse_iterator() : n(nullptr) {};
         reverse_iterator(pointer node) : n(node) {};
         reverse_iterator(const reverse_iterator &it) : n(it.n){};
-        value_type& operator*() const { return *n; }
+        value_type& operator*() { return *n; }
+
+        reverse_iterator& operator+=(difference_type pos) { n -= pos; return *this; }
+        reverse_iterator& operator-=(difference_type pos) { n += pos; return *this; }
+        reverse_iterator operator+(difference_type pos) { reverse_iterator tmp(*this); tmp+=pos; return tmp; }
+        reverse_iterator operator-(difference_type pos) { reverse_iterator tmp(*this); tmp-=pos; return tmp; }
+        friend inline reverse_iterator operator+(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator(tmp); tmp+=pos; return tmp; }
+        friend inline reverse_iterator operator-(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline difference_type operator-(const reverse_iterator& rhs, const reverse_iterator& lhs) { return rhs.n - lhs.n; }
+        difference_type operator-(const reverse_iterator& rhs) { return rhs.n - n; }
+        bool operator<(const iterator &rhs) { return rhs.n < n; }
+        bool operator<=(const iterator &rhs) { return rhs.n <= n; }
+        bool operator>(const iterator &rhs) { return rhs.n > n; }
+        bool operator>=(const iterator &rhs) { return rhs.n >= n; }
+        value_type& operator[](difference_type pos) { return *(n-pos); }
 
         reverse_iterator &operator++() {
             n--;
@@ -160,6 +202,20 @@ public:
         const_reverse_iterator(const const_reverse_iterator &it) : n(it.n){};
         const_reverse_iterator(const typename vector<value_type>::const_iterator &it) : n(it.n) {};
         value_type &operator*() const { return *n; }
+
+        const_reverse_iterator& operator+=(difference_type pos) { n -= pos; return *this; }
+        const_reverse_iterator& operator-=(difference_type pos) { n += pos; return *this; }
+        const_reverse_iterator operator+(difference_type pos) { const_reverse_iterator tmp(*this); tmp+=pos; return tmp; }
+        const_reverse_iterator operator-(difference_type pos) { const_reverse_iterator tmp(*this); tmp-=pos; return tmp; }
+        friend inline const_reverse_iterator operator+(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator(tmp); tmp+=pos; return tmp; }
+        friend inline const_reverse_iterator operator-(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline difference_type operator-(const const_reverse_iterator& rhs, const const_reverse_iterator& lhs) { return rhs.n - lhs.n; }
+        difference_type operator-(const const_reverse_iterator& rhs) { return rhs.n - n; }
+        bool operator<(const iterator &rhs) { return rhs.n < n; }
+        bool operator<=(const iterator &rhs) { return rhs.n <= n; }
+        bool operator>(const iterator &rhs) { return rhs.n > n; }
+        bool operator>=(const iterator &rhs) { return rhs.n >= n; }
+        value_type& operator[](difference_type pos) { return *(n-pos); }
 
         const_reverse_iterator &operator++() {
             n--;
