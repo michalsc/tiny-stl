@@ -240,7 +240,7 @@ public:
             pos = _length;
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
-        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
+        memmove(_buffer + pos + len, _buffer + pos, _length - pos + 1);
         for (char *b = _buffer + pos; it != last; ++it) *b++ = *it;
         _length += len;
         return iterator(_buffer + pos);

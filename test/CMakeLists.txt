@@ -1,13 +1,10 @@
-add_executable(test_string
-    string_test.cpp support.cpp)
+add_executable(test_string string_test.cpp)
 target_link_libraries(test_string tinystl)
 
-add_executable(test_list
-    list_test.cpp support.cpp)
+add_executable(test_list list_test.cpp)
 target_link_libraries(test_list tinystl)
 
-add_executable(test_vector
-    vector_test.cpp support.cpp)
+add_executable(test_vector vector_test.cpp)
 target_link_libraries(test_vector tinystl)
 
 add_test(NAME string COMMAND test_string)

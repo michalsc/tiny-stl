@@ -8,6 +8,7 @@ get_verstring(VERSTRING)
 add_library(tinystl STATIC
     lib/string.cpp
     lib/version.cpp
+    lib/memory.cpp
 )
 target_include_directories(tinystl PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_compile_definitions(tinystl PRIVATE VERSION_STRING="${VERSTRING}")

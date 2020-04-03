@@ -34,8 +34,8 @@ public:
     ~allocator() {};
     pointer address(reference x) { return &x; }
     const_pointer address(const_reference x) { return &x; }
-    pointer allocate(size_type n) { pointer p = (pointer)AllocMem(n * sizeof(value_type), MEMF_CLEAR); return p; }
-    void deallocate(pointer p, size_type n) { if (n>0 && p!=nullptr) FreeMem((void*)p, n * sizeof(T)); }
+    pointer allocate(size_type n) { pointer p = (pointer)mungwall_malloc(n * sizeof(value_type)); return p; }
+    void deallocate(pointer p, size_type n) { if (n>0 && p!=nullptr) mungwall_free((void*)p, n * sizeof(T)); }
     size_type max_size() { return (size_type)-1 / sizeof(value_type); }
     void construct(pointer p, const_reference val) { new((void*)p) value_type(val); }
     void destroy(pointer p) { p->~value_type(); }

@@ -62,14 +62,14 @@ string::string(const char *src) : _buffer(NULL), _capacity(0), _length(0)
 
         resize_buffer(len + 1);
         _length = len;
-        CopyMem(src, _buffer, len + 1);
+        memmove(_buffer, src, len + 1);
     }
 }
 
 string::string(const string& str) : _buffer(NULL), _capacity(0), _length(0)
 {
     resize_buffer(str._length + 1);
-    CopyMem(str._buffer, _buffer, str._length + 1);
+    memmove(_buffer, str._buffer, str._length + 1);
     _length = str._length;
 }
 
@@ -79,7 +79,7 @@ string::string(const string& str, int pos, int len) : _buffer(NULL), _capacity(0
         len = str._length - pos;
 
     resize_buffer(len + 1);
-    CopyMem(str._buffer + pos, _buffer, len);
+    memmove(_buffer, str._buffer + pos, len);
     _buffer[len] = 0;
     _length = len;
 }
@@ -87,7 +87,7 @@ string::string(const string& str, int pos, int len) : _buffer(NULL), _capacity(0
 string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
 {
     resize_buffer(n + 1);
-    CopyMem(src, _buffer, n);
+    memmove(_buffer, src, n);
     _buffer[n] = 0;
     _length = n;
 }
@@ -95,7 +95,7 @@ string::string(const char *src, int n) : _buffer(NULL), _capacity(0), _length(0)
 string::string(int n, char c) : _buffer(NULL), _capacity(0), _length(0)
 {
     resize_buffer(n + 1);
-    SetMem(_buffer, n, c);
+    memset(_buffer, c, n);
     _buffer[n] = 0;
     _length = n;
 }
@@ -113,7 +113,7 @@ string::string(string&& str)
 string& string::operator= (const string& str)
 {
     resize_buffer(str._length + 1);
-    CopyMem(str._buffer, _buffer, str._length + 1);
+    memmove(_buffer, str._buffer, str._length + 1);
     _length = str._length;
 
     return *this;
@@ -125,7 +125,7 @@ string& string::operator= (const char* str)
     {
         int len = _strlen_(str);
         resize_buffer(len + 1);
-        CopyMem(str, _buffer, len + 1);
+        memmove(_buffer, str, len + 1);
         _length = len;
     }
     else
@@ -175,7 +175,7 @@ void string::resize_buffer(int size)
             if (size > (_capacity))
             {
                 char * new_buff = allocator<char>().allocate(size);
-                CopyMem(_buffer, new_buff, _capacity);
+                memcpy(new_buff, _buffer, _capacity);
                 allocator<char>().deallocate(_buffer, _capacity);
                 _buffer = new_buff;
                 _capacity = size;
@@ -224,7 +224,7 @@ void string::resize(int n, char c)
         if (n >= _capacity)
             resize_buffer(n + 1);
 
-        SetMem(_buffer + _length, n - _length, c);
+        memset(_buffer + _length, c, n - _length);
         _length = n;
     }
 }
@@ -233,7 +233,7 @@ void string::clear()
 {
     if (_buffer && _length > 0)
     {
-        SetMem(_buffer, _length, 0);
+        memset(_buffer, 0, _length);
         _length = 0;
     }
 }
@@ -245,7 +245,7 @@ string& string::operator+= (const string& str)
     if (_capacity - _length < len)
         resize_buffer(_length + len);
 
-    CopyMem(str._buffer, _buffer + _length, len);
+    memmove(_buffer + _length, str._buffer, len);
     _length += len - 1;
 
     return *this;
@@ -258,7 +258,7 @@ string& string::operator+= (const char *str)
     if (_capacity - _length < len)
         resize_buffer(_length + len);
 
-    CopyMem(str, _buffer + _length, len);
+    memmove(_buffer + _length, str, len);
     _length += len - 1;
 
     return *this;
@@ -287,7 +287,7 @@ string& string::append(const string &str, int subpos, int sublen)
         if (_capacity <= (_length + len))
             resize_buffer(_length + len + 1);
 
-        CopyMem(str._buffer + subpos, _buffer + _length, len + 1);
+        memmove(_buffer + _length, str._buffer + subpos, len + 1);
         _length += len;
     }
     return *this;
@@ -305,7 +305,7 @@ string& string::append(const char *s, int n)
         if (_length + len >= _capacity)
             resize_buffer(_length + len + 1);
 
-        CopyMem(s, _buffer + _length, len);
+        memmove(_buffer + _length, s, len);
         _length += len;
     }
     return *this;
@@ -318,7 +318,7 @@ string& string::append(int n, char c)
         if (_length + n >= _capacity)
             resize_buffer(_length + n + 1);
 
-        SetMem(_buffer + _length, n, c);
+        memset(_buffer + _length, c, n);
 
         _buffer[_length + n] = 0;
         _length += n;
@@ -330,7 +330,7 @@ string& string::append(int n, char c)
 string& string::assign(const string& str)
 {
     resize_buffer(str._length + 1);
-    CopyMem(str._buffer, _buffer, str._length + 1);
+    memmove(_buffer, str._buffer, str._length + 1);
     _length = str._length;
 
     return *this;
@@ -344,7 +344,7 @@ string& string::assign(const string& str, int subpos, int sublen)
             sublen = str._length - subpos;
 
         resize_buffer(sublen + 1);
-        CopyMem(str._buffer + subpos, _buffer, sublen);
+        memmove(_buffer, str._buffer + subpos, sublen);
         _buffer[sublen] = 0;
         _length = sublen;
     }
@@ -361,7 +361,7 @@ string& string::assign(const char *s, int n)
             len = n;
 
         resize_buffer(len + 1);
-        CopyMem(s, _buffer, len);
+        memmove(_buffer, s, len);
         _buffer[len] = 0;
         _length = len;
     }
@@ -372,7 +372,7 @@ string& string::assign(const char *s, int n)
 string& string::assign(int n, char c)
 {
     resize_buffer(n + 1);
-    SetMem(_buffer, n, c);
+    memset(_buffer, c, n);
     _buffer[n] = 0;
     _length = n;
 
@@ -402,8 +402,8 @@ string& string::insert(int pos, const string& str)
     if (_length + str._length + 1 > _capacity)
         resize_buffer(_length + str._length + 1);
 
-    CopyMem(_buffer + pos, _buffer + pos + str._length, _length - pos + 1);
-    CopyMem(str._buffer, _buffer + pos, str._length);
+    memmove(_buffer + pos + str._length, _buffer + pos, _length - pos + 1);
+    memmove(_buffer + pos, str._buffer, str._length);
 
     _length += str._length;
 
@@ -423,11 +423,10 @@ string& string::insert(int pos, const string& str, int subpos, int sublen)
         if (_length + sublen + 1 > _capacity)
             resize_buffer(_length + sublen + 1);
 
-        CopyMem(_buffer + pos, _buffer + pos + sublen, _length - pos + 1);
-        CopyMem(str._buffer + subpos, _buffer + pos, sublen);
+        memmove(_buffer + pos + sublen, _buffer + pos, _length - pos + 1);
+        memmove(_buffer + pos, str._buffer + subpos, sublen);
 
         _length += sublen;
-
     }
 
     return *this;
@@ -445,8 +444,8 @@ string& string::insert(int pos, const char* s)
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
 
-        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        CopyMem(s, _buffer + pos, len);
+        memmove(_buffer + pos + len, _buffer + pos, _length - pos + 1);
+        memmove(_buffer + pos, s, len);
 
         _length += len;
     }
@@ -469,8 +468,8 @@ string& string::insert(int pos, const char* s, int n)
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
 
-        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        CopyMem(s, _buffer + pos, len);
+        memmove(_buffer + pos + len, _buffer + pos, _length - pos + 1);
+        memmove(_buffer + pos, s, len);
 
         _length += len;
     }
@@ -490,8 +489,8 @@ string& string::insert(int pos, int n, char c)
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
 
-        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        SetMem(_buffer + pos, len, c);
+        memmove(_buffer + pos + len, _buffer + pos, _length - pos + 1);
+        memset(_buffer + pos, c, len);
 
         _length += len;
     }
@@ -519,8 +518,8 @@ string::iterator string::insert(string::const_iterator p, int n, char c)
         if (_length + len + 1 > _capacity)
             resize_buffer(_length + len + 1);
 
-        CopyMem(_buffer + pos, _buffer + pos + len, _length - pos + 1);
-        SetMem(_buffer + pos, len, c);
+        memmove(_buffer + pos + len, _buffer + pos, _length - pos + 1);
+        memset(_buffer + pos, c, len);
 
         _length += len;
     }
@@ -535,7 +534,7 @@ string& string::erase(int pos, int len)
         if (len == npos || pos + len > _length)
             len = _length - pos;
 
-        CopyMem(_buffer + pos + len, _buffer + pos, _length - pos - len);
+        memmove(_buffer + pos, _buffer + pos + len, _length - pos - len);
         _length-=len;
         _buffer[_length] = 0;
     }
@@ -547,7 +546,7 @@ string::iterator string::erase(string::const_iterator p)
 {
     int pos = p - const_iterator(_buffer);
 
-    CopyMem(_buffer + pos + 1, _buffer + pos, _length - pos + 1);
+    memmove(_buffer + pos, _buffer + pos + 1, _length - pos + 1);
 
     --_length;
 
@@ -571,7 +570,7 @@ int string::copy(char *c, int len, int pos)
         if (pos + len > _length)
             len = _length - pos;
 
-        CopyMem(_buffer + pos, c, len);
+        memmove(c, _buffer + pos, len);
 
         return len;
     }
@@ -583,8 +582,8 @@ string operator+(const string &lhs, const string &rhs)
     string result;
 
     result.resize_buffer(lhs._length + rhs._length + 1);
-    CopyMem(lhs._buffer, result._buffer, lhs._length);
-    CopyMem(rhs._buffer, result._buffer + lhs._length, rhs._length + 1);
+    memmove(result._buffer, lhs._buffer, lhs._length);
+    memmove(result._buffer + lhs._length, rhs._buffer, rhs._length + 1);
     result._length = lhs._length + rhs._length;
 
     return result;
@@ -598,8 +597,8 @@ string operator+(const string &lhs, const char *rhs)
 
         int len = _strlen_(rhs);
         result.resize_buffer(lhs._length + len + 1);
-        CopyMem(lhs._buffer, result._buffer, lhs._length);
-        CopyMem(rhs, result._buffer + lhs._length, len + 1);
+        memmove(result._buffer, lhs._buffer, lhs._length);
+        memmove(result._buffer + lhs._length, rhs, len + 1);
         result._length = lhs._length + len;
 
         return result;
@@ -616,8 +615,8 @@ string operator+(const char *lhs, const string &rhs)
 
         int len = _strlen_(lhs);
         result.resize_buffer(len + rhs._length + 1);
-        CopyMem(lhs, result._buffer, len);
-        CopyMem(rhs._buffer, result._buffer + len, rhs._length + 1);
+        memmove(result._buffer, lhs, len);
+        memmove(result._buffer + len, rhs._buffer, rhs._length + 1);
         result._length = len + rhs._length;
 
         return result;
@@ -631,7 +630,7 @@ string operator+(const string &lhs, char rhs)
     string result;
 
     result.resize_buffer(lhs._length + 2);
-    CopyMem(lhs._buffer, result._buffer, lhs._length);
+    memmove(result._buffer, lhs._buffer, lhs._length);
     result._buffer[lhs._length] = rhs;
     result._buffer[lhs._length + 1] = 0;
     result._length = lhs._length + 1;
@@ -645,7 +644,7 @@ string operator+(char lhs, const string &rhs)
 
     result.resize_buffer(rhs._length + 2);
     result._buffer[0] = lhs;
-    CopyMem(rhs._buffer, result._buffer + 1, rhs._length + 1);
+    memmove(result._buffer + 1, rhs._buffer, rhs._length + 1);
     result._length = rhs._length + 1;
 
     return result;

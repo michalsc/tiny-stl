@@ -1,2 +1,2 @@
-add_executable(example main.cpp ../test/support.cpp)
+add_executable(example main.cpp)
 target_link_libraries(example tinystl)
