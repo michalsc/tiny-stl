@@ -113,7 +113,7 @@ public:
         bool operator<=(const iterator &rhs) { return rhs.n >= n; }
         bool operator>(const iterator &rhs) { return rhs.n < n; }
         bool operator>=(const iterator &rhs) { return rhs.n <= n; }
-        value_type& operator[](difference_type pos) { return *(n+pos); }
+        value_type& operator[](difference_type pos) const { return *(n+pos); }
 
         const_iterator &operator++() {
             n++;
@@ -215,7 +215,7 @@ public:
         bool operator<=(const iterator &rhs) { return rhs.n <= n; }
         bool operator>(const iterator &rhs) { return rhs.n > n; }
         bool operator>=(const iterator &rhs) { return rhs.n >= n; }
-        value_type& operator[](difference_type pos) { return *(n-pos); }
+        value_type& operator[](difference_type pos) const { return *(n-pos); }
 
         const_reverse_iterator &operator++() {
             n--;
