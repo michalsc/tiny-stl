@@ -12,8 +12,11 @@
             "suppressTaskName": true,
             "isBuildCommand": true,
             "args": [
-                "make all"
+                "make"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": [ "relative", "${workspaceRoot}" ],
@@ -32,8 +35,11 @@
             "suppressTaskName": true,
             "isBuildCommand": true,
             "args": [
-                "make lib"
+                "make tinystl"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": [ "relative", "${workspaceRoot}" ],
@@ -54,6 +60,9 @@
             "args": [
                 "make test"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": [ "relative", "${workspaceRoot}" ],
@@ -72,8 +81,20 @@
             "suppressTaskName": true,
             "isTestCommand": true,
             "args": [
-                "./Build/MiniStd"
+                "./build/example/example"
             ]
+        },
+        {
+            "taskName": "Configure",
+            "suppressTaskName": true,
+            "isBuildCommand": true,
+            "args": [
+                "mkdir build; cd build; cmake .."
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+
         }
     ]
 }
