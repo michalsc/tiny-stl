@@ -30,9 +30,13 @@ public:
     typedef const value_type&       const_reference;
     typedef value_type*             pointer;
     typedef const value_type*       const_pointer;
-    typedef intptr_t                size_type;
+    typedef uintptr_t                size_type;
     typedef ptrdiff_t               difference_type;
 
+private:
+    const size_type _initialGrowthAdd = 4;
+
+public:
     // Interators
     class const_iterator;
     // Bidirectional iterator for list
@@ -74,14 +78,14 @@ public:
 
     class const_iterator : public std::iterator<std::bidirectional_iterator_tag, value_type>
     {
-        const pointer n;
+        pointer n;
 
       public:
         const_iterator() : n(nullptr){};
         const_iterator(pointer node) : n(node){};
         const_iterator(const const_iterator &it) : n(it.n){};
         const_iterator(const typename vector<value_type>::iterator &it) : n(it.n) {};
-        value_type &operator*() const { return n->value; }
+        value_type &operator*() const { return *n; }
 
         const_iterator &operator++() {
             n++;
@@ -148,14 +152,14 @@ public:
 
     class const_reverse_iterator : public std::iterator<std::random_access_iterator_tag, value_type>
     {
-        const pointer n;
+        pointer n;
 
       public:
         const_reverse_iterator() : n(nullptr){};
         const_reverse_iterator(pointer node) : n(node){};
         const_reverse_iterator(const const_reverse_iterator &it) : n(it.n){};
         const_reverse_iterator(const typename vector<value_type>::const_iterator &it) : n(it.n) {};
-        value_type &operator*() const { return n->value; }
+        value_type &operator*() const { return *n; }
 
         const_reverse_iterator &operator++() {
             n--;
@@ -184,9 +188,9 @@ public:
 
     // Constructors
     explicit vector(const allocator_type& alloc = allocator_type())
-        : _contents(nullptr), _count(0), _capacity(0), _growthAdd(4), _alloc(alloc) { }
+        : _contents(nullptr), _count(0), _capacity(0), _growthAdd(_initialGrowthAdd), _alloc(alloc) { }
     vector(size_type count, const value_type& value, const allocator_type& alloc = allocator_type())
-        : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc)
+        : _count(count), _capacity(count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
     {
         _contents = _alloc.allocate(count);
         for (int i=0; i < count; i++) {
@@ -194,13 +198,13 @@ public:
         }
     }
     explicit vector(size_type count, const allocator_type& alloc = allocator_type())
-        : _count(count), _capacity(count), _growthAdd(4), _alloc(alloc)
+        : _count(count), _capacity(count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
     {
         _contents = _alloc.allocate(count);
     }
     template< typename InputIt,
               typename = std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
-    vector( InputIt first, InputIt last, const allocator_type& alloc = allocator_type() ) : _alloc(alloc), _growthAdd(4)
+    vector( InputIt first, InputIt last, const allocator_type& alloc = allocator_type() ) : _alloc(alloc), _growthAdd(_initialGrowthAdd)
     {
         _count = std::distance(first, last);
         _capacity = _count;
@@ -211,7 +215,7 @@ public:
         }
     }
     vector(const vector& other)
-        : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(other.get_allocator())
+        : _count(other._count), _capacity(other._count), _growthAdd(_initialGrowthAdd), _alloc(other.get_allocator())
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -221,7 +225,7 @@ public:
         }
     }
     vector(const vector& other, const allocator_type & alloc)
-        : _count(other._count), _capacity(other._count), _growthAdd(4), _alloc(alloc)
+        : _count(other._count), _capacity(other._count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -239,7 +243,7 @@ public:
         other._contents = nullptr;
         other._capacity = 0;
         other._size = 0;
-        other._growthAdd = 4;
+        other._growthAdd = _initialGrowthAdd;
     }
     vector(vector&& other, const allocator_type& alloc)
         : _count(other._count), _capacity(other._capacity), _growthAdd(other._growthAdd), _alloc(alloc)
@@ -251,7 +255,7 @@ public:
             other._contents = nullptr;
             other._capacity = 0;
             other._size = 0;
-            other._growthAdd = 4;
+            other._growthAdd = _initialGrowthAdd;
         }
         else {
             if (_count > 0) {
@@ -263,7 +267,7 @@ public:
         }
     }
     vector(std::initializer_list<value_type> init, const allocator_type& alloc = allocator_type())
-        : _count(init.size()), _capacity(init.size()), _growthAdd(4), _alloc(alloc)
+        : _count(init.size()), _capacity(init.size()), _growthAdd(_initialGrowthAdd), _alloc(alloc)
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -279,7 +283,7 @@ public:
     ~vector()
     {
         if (_count > 0) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -291,7 +295,7 @@ public:
     vector& operator=(const vector& other)
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -318,7 +322,7 @@ public:
     vector& operator=(vector&& other)
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -333,18 +337,17 @@ public:
             other._contents = nullptr;
             other._capacity = 0;
             other._size = 0;
-            other._growthAdd = 4;
+            other._growthAdd = _initialGrowthAdd;
         }
         else {
             _capacity = other._count;
             _count = other._count;
-            _growthAdd = 4;
+            _growthAdd = _initialGrowthAdd;
             _contents = _alloc.allocate(_capacity);
 
-            if (_count > 0) {
-                for (int i=0; i < _count; i++) {
-                    _contents[i] = value_type(other._contents[i]);
-                }
+            pointer p = _contents;
+            for (auto it: other) {
+                _alloc.construct(p++, it);
             }
         }
         return *this;
@@ -352,7 +355,7 @@ public:
     vector& operator=(std::initializer_list<value_type> ilist)
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -360,8 +363,8 @@ public:
         }
         if (_capacity < ilist.size()) {
             _alloc.deallocate(_contents, _capacity);
-            _contents = _alloc.allocate(ilist.size());
             _capacity = ilist.size();
+            _contents = _alloc.allocate(_capacity);
         }
         pointer p = _contents;
         _count = ilist.size();
@@ -373,7 +376,7 @@ public:
     void assign(size_type count, const value_type& value)
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -385,9 +388,9 @@ public:
             _contents = _alloc.allocate(count);
         }
         for (int i=0; i < count; i++) {
-            _alloc.construct(_contents[i], value);
+            _alloc.construct(&_contents[i], value);
         }
-        _growthAdd = 4;
+        _growthAdd = _initialGrowthAdd;
         _count = count;
     }
     template < class InputIt,
@@ -395,7 +398,7 @@ public:
     void assign( InputIt first, InputIt last )
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -413,7 +416,7 @@ public:
     void assign(std::initializer_list<value_type> ilist)
     {
         if (_capacity) {
-            if (std::is_pointer<value_type>::value) {
+            if (!std::is_pointer<value_type>::value) {
                 for (int i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
@@ -464,10 +467,10 @@ public:
     const_iterator cbegin() const noexcept { if (_count) return const_iterator(&_contents[0]); else return const_iterator(nullptr); }
     iterator end() noexcept { if (_count) return iterator(&_contents[_count]); else return iterator(nullptr); }
     const_iterator cend() const noexcept { if (_count) return const_iterator(&_contents[_count]); else return const_iterator(nullptr); }
-    reverse_iterator rbegin() noexcept { if (_count) return iterator(&_contents[_count-1]); else return iterator(nullptr); }
-    const_iterator crbegin() const noexcept { if (_count) return const_iterator(&_contents[_count-1]); else return const_iterator(nullptr); }
-    iterator rend() noexcept { if (_count) return iterator(&_contents[-1]); else return iterator(nullptr); }
-    const_iterator crend() const noexcept { if (_count) return const_iterator(&_contents[-1]); else return const_iterator(nullptr); }
+    reverse_iterator rbegin() noexcept { if (_count) return reverse_iterator(&_contents[_count-1]); else return reverse_iterator(nullptr); }
+    const_reverse_iterator crbegin() const noexcept { if (_count) return const_reverse_iterator(&_contents[_count-1]); else return const_reverse_iterator(nullptr); }
+    reverse_iterator rend() noexcept { if (_count) return reverse_iterator(&_contents[-1]); else return reverse_iterator(nullptr); }
+    const_reverse_iterator crend() const noexcept { if (_count) return const_reverse_iterator(&_contents[-1]); else return const_reverse_iterator(nullptr); }
 
     // Capacity
     bool empty() { return 0 == _count; }
@@ -475,17 +478,24 @@ public:
     size_type max_size() { return (uintptr_t)-1 / sizeof(value_type); }
     size_type capacity() { return _capacity; }
     void shrink_to_fit() {}
-    void reserve(size_type new_cap)
+    void reserve(size_type required)
     {
-        if (new_cap > _capacity)
-        {
-            pointer _p = _alloc.allocate(new_cap);
-            if (_contents != nullptr) {
-                memcpy(_p, _contents, _count * sizeof(value_type));
-                _alloc.deallocate(_count, _capacity);
+        if (required > _capacity) {
+            if (required > max_size()) {
+                throw std::length_error("tinystd::vector::reserve() too large!");
             }
-            _contents = _p;
-            _capacity = new_cap;
+            if (required / _growthAdd < max_size()) {
+                required = ((required * _growthAdd++) / _initialGrowthAdd + 15) & ~15;
+            }
+            pointer new_buffer = _alloc.allocate(required);
+            if (new_buffer) {
+                if (_contents != nullptr) {
+                    memcpy(new_buffer, _contents, _count * sizeof(value_type));
+                    _alloc.deallocate(_contents, _capacity);
+                }
+                _contents = new_buffer;
+                _capacity = required;
+            }
         }
     }
 
@@ -516,9 +526,159 @@ public:
         other._growthAdd = tmp1;
     }
 
-private:
-    void _expand_capacity(size_type required);
+    void emplace_back(value_type&& value)
+    {
+        reserve(_count + 1);
+        _contents[_count++] = std::forward<value_type>(value);
+    }
 
+    void push_back(value_type&& value)
+    {
+        emplace_back(std::move(value));
+    }
+
+    void push_back(value_type& value)
+    {
+        reserve(_count + 1);
+        _alloc.construct(&_contents[_count++], value);
+    }
+
+    void pop_bacck()
+    {
+        if (_count > 0) {
+            _alloc.deconstruct(&_contents[--_count]);
+        }
+    }
+
+    void resize(size_type count)
+    {
+        if (count < _count) {
+            for (size_type i=count; i < _count; i++) {
+                _alloc.deconstruct(&_contents[i]);
+            }
+        }
+        else if (count > _count) {
+            reserve(count);
+            for (size_type i=_count; i < _count; i++) {
+                _alloc.construct(&_contents[i], value_type());
+            }
+        }
+
+        _count = count;
+    }
+
+    void resize(size_type count, const value_type& value)
+    {
+        if (count < _count) {
+            for (size_type i=count; i < _count; i++) {
+                _alloc.deconstruct(&_contents[i]);
+            }
+        }
+        else if (count > _count) {
+            reserve(count);
+            for (size_type i=_count; i < _count; i++) {
+                _alloc.construct(&_contents[i], value_type(value));
+            }
+        }
+
+        _count = count;
+    }
+
+    iterator insert(const_iterator pos, const value_type& value )
+    {
+        size_type position = pos.n - _contents;
+
+        reserve(_count + 1);
+        for(size_type p = _count; p > position; --p) {
+            _contents[p] = std::move(_contents[p-1]);
+        }
+        _alloc.construct(&_contents[position], value_type(value));
+        _count++;
+
+        return iterator(&_contents[position]);
+    }
+
+    iterator insert(const_iterator pos, value_type&& value )
+    {
+        size_type position = pos.n - _contents;
+
+        reserve(_count + 1);
+        for(size_type p = _count; p > position; --p) {
+            _contents[p] = std::move(_contents[p-1]);
+        }
+        _contents[position] = std::forward<value_type>(value);
+        _count++;
+
+        return iterator(&_contents[position]);
+    }
+
+    iterator insert( const_iterator pos, size_type count, const T& value )
+    {
+        if (count > 0) {
+            size_type position = pos.n - _contents;
+
+            reserve(_count + count);
+            for(size_type p = _count + count - 1; p > position + count - 1; --p) {
+                _contents[p] = std::move(_contents[p-count]);
+            }
+            for (int c=0; c < count; c++) {
+                _alloc.construct(&_contents[position + c], value_type(value));
+            }
+            _count+=count;
+            return iterator(&_contents[position]);
+        } else {
+            return iterator(pos.n);
+        }
+    }
+
+    template < class InputIt,
+               typename = std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
+    iterator assign(const_iterator pos, InputIt first, InputIt last)
+    {
+        size_type position = pos.n - _contents;
+        size_type count = std::distance(first, last);
+        if (count) {
+            reserve(_count + count);
+            for(size_type p = _count + count - 1; p > position + count - 1; --p) {
+                _contents[p] = std::move(_contents[p-count]);
+            }
+            pointer p = &_contents[position];
+            for (InputIt it = first; it != last; ++it, ++p) {
+                _alloc.construct(p, *it);
+            }
+            return iterator(&_contents[position]);
+        }
+        else {
+            return iterator(pos.n);
+        }
+    }
+
+    iterator insert( const_iterator pos, std::initializer_list<T> ilist )
+    {
+        size_type position = pos.n - _contents;
+        if (ilist.size()) {
+            size_type count = ilist.size();
+            reserve(_count + count);
+            for(size_type p = _count + count - 1; p > position + count - 1; --p) {
+                _contents[p] = std::move(_contents[p-count]);
+            }
+            pointer p = &_contents[position];
+            for (auto it: ilist) {
+                _alloc.construct(p++, it);
+            }
+            _count+=count;
+            return iterator(&_contents[position]);
+        } else {
+            return iterator(pos.n);
+        }
+    }
+
+    // iterator erase( const_iterator pos );
+    // iterator erase( const_iterator first, const_iterator last );
+
+//emplace is missing
+
+private:
     pointer         _contents;
     size_type       _count;
     size_type       _capacity;
