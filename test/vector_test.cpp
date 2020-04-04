@@ -165,4 +165,47 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
             CHECK( ints[i] == rints[rints.size() - i - 1] );
         }
     }
+
+    SECTION("Modifiers") {
+        tinystd::vector<int> vec(3,100);
+        
+        CHECK( vec.size() == 3 );
+        CHECK( (vec[0] == 100 && vec[1] == 100 && vec[2] == 100) );
+    
+        auto it = vec.begin();
+        it = vec.insert(it, 200);
+        
+        CHECK( vec.size() == 4 );
+        CHECK( vec[0] == 200 );
+        CHECK( (vec[1] == 100 && vec[2] == 100 && vec[3] == 100) );
+
+        vec.insert(it,2,300);
+        CHECK( vec.size() == 6);
+        CHECK( vec[0] == 300 );
+        CHECK( vec[1] == 300 );
+        CHECK( vec[2] == 200 );
+
+        // "it" no longer valid, get a new one:
+        it = vec.begin();
+    
+        tinystd::vector<int> vec2(2,400);
+        vec.insert(it+2, vec2.begin(), vec2.end());
+
+        CHECK( vec.size() == 8);
+        CHECK( vec[0] == 300 );
+        CHECK( vec[1] == 300 );
+        CHECK( vec[2] == 400 );
+        CHECK( vec[3] == 400 );
+        CHECK( vec[4] == 200 );
+        CHECK( vec[5] == 100 );
+
+        int arr[] = { 501,502,503 };
+        int test_arr[] = { 501, 502, 503, 300, 300, 400, 400, 200, 100, 100, 100 };
+        vec.insert(vec.begin(), arr, arr+3);
+
+        CHECK( vec.size() == 11 );
+        for (int i=0; i < 11; i++) {
+            CHECK( vec[i] == test_arr[i] );
+        }
+    }
 }

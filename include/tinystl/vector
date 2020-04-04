@@ -520,13 +520,17 @@ public:
 
     // Iterators
     iterator begin() noexcept { if (_count) return iterator(&_contents[0]); else return iterator(nullptr); }
+    const_iterator begin() const noexcept { if (_count) return const_iterator(&_contents[0]); else return const_iterator(nullptr); }
     const_iterator cbegin() const noexcept { if (_count) return const_iterator(&_contents[0]); else return const_iterator(nullptr); }
     iterator end() noexcept { if (_count) return iterator(&_contents[_count]); else return iterator(nullptr); }
     const_iterator cend() const noexcept { if (_count) return const_iterator(&_contents[_count]); else return const_iterator(nullptr); }
+    const_iterator end() const noexcept { if (_count) return const_iterator(&_contents[_count]); else return const_iterator(nullptr); }
     reverse_iterator rbegin() noexcept { if (_count) return reverse_iterator(&_contents[_count-1]); else return reverse_iterator(nullptr); }
     const_reverse_iterator crbegin() const noexcept { if (_count) return const_reverse_iterator(&_contents[_count-1]); else return const_reverse_iterator(nullptr); }
+    const_reverse_iterator rbegin() const noexcept { if (_count) return const_reverse_iterator(&_contents[_count-1]); else return const_reverse_iterator(nullptr); }
     reverse_iterator rend() noexcept { if (_count) return reverse_iterator(&_contents[-1]); else return reverse_iterator(nullptr); }
     const_reverse_iterator crend() const noexcept { if (_count) return const_reverse_iterator(&_contents[-1]); else return const_reverse_iterator(nullptr); }
+    const_reverse_iterator rend() const noexcept { if (_count) return const_reverse_iterator(&_contents[-1]); else return const_reverse_iterator(nullptr); }
 
     // Capacity
     bool empty() { return 0 == _count; }
@@ -689,7 +693,7 @@ public:
 
     template < class InputIt,
                typename = std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
-    iterator assign(const_iterator pos, InputIt first, InputIt last)
+    iterator insert(const_iterator pos, InputIt first, InputIt last)
     {
         size_type position = pos.n - _contents;
         size_type count = std::distance(first, last);
@@ -702,6 +706,7 @@ public:
             for (InputIt it = first; it != last; ++it, ++p) {
                 _alloc.construct(p, *it);
             }
+            _count+=count;
             return iterator(&_contents[position]);
         }
         else {
