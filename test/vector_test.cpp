@@ -101,7 +101,6 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
         // Move operator transferred nums1 into nums3, leaving nums1 empty
         CHECK( (nums1.size() == 0 && nums2.size() == 6 && nums3.size() == 6) );
 
-
         tinystd::vector<char> characters;
         characters.assign(5, 'a');
 
@@ -110,6 +109,8 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
         for (int i=0; i < 5; i++) {
             CHECK( characters[i] == 'a' );
         }
+
+        CHECK( nums2 == nums3 );
     }
 
     SECTION("Element access") {
@@ -207,5 +208,49 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
         for (int i=0; i < 11; i++) {
             CHECK( vec[i] == test_arr[i] );
         }
+
+        // Erase missing...
+
+        tinystd::vector<tinystd::string> numbers;
+ 
+        numbers.push_back("abc");
+        tinystd::string s = "def";
+        numbers.push_back(std::move(s));
+
+        CHECK( numbers.size() == 2 );
+        CHECK( numbers[0] == "abc" );
+        CHECK( numbers[1] == "def" );
+        CHECK( s == "" );
+
+        tinystd::vector<int> numbers1;
+
+        numbers1.push_back(5);
+        numbers1.push_back(3);
+        numbers1.push_back(4);
+        numbers1.pop_back();
+
+        CHECK( numbers1.size() == 2 );
+        CHECK( numbers1[0] == 5 );
+        CHECK( numbers1[1] == 3 );
+
+        tinystd::vector<int> c = {1, 2, 3};
+        CHECK( c.size() == 3 );
+        CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3) );
+        c.resize(5);
+        CHECK( c.size() == 5 );
+        CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3 && c[4] == 0 && c[5] == 0) );
+        c.resize(2);
+        CHECK( c.size() == 2 );
+        CHECK( (c[0] == 1 && c[1] == 2) );
+
+        tinystd::vector<int> v1{1, 2, 3};
+        tinystd::vector<int> v2{7, 8, 9};
+ 
+        v2.swap(v1);
+
+        CHECK( v1.size() == 3 );
+        CHECK( v2.size() == 3 );
+        CHECK( (v1[0] == 7 && v1[1] == 8 && v1[2] == 9) );
+        CHECK( (v2[0] == 1 && v2[1] == 2 && v2[2] == 3) );
     }
 }
