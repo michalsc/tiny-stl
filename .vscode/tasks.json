@@ -39,7 +39,10 @@
                 "test"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/build"
+                "cwd": "${workspaceFolder}/build",
+                "env": {
+                    "CTEST_OUTPUT_ON_FAILURE": "1"
+                }
             }
         },
         {
