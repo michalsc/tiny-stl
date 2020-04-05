@@ -13,7 +13,9 @@
 #include <strings.h>
 #include <tinystl/bits/support.h>
 
-#ifndef BUG
+#ifdef USE_KPRINTF
+#define BUG(...) kprintf(__VA_ARGS__)
+#else
 #define BUG(...) printf(__VA_ARGS__)
 #endif
 
