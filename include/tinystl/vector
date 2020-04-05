@@ -734,8 +734,49 @@ public:
         }
     }
 
-    // iterator erase( const_iterator pos );
-    // iterator erase( const_iterator first, const_iterator last );
+    iterator erase(const_iterator pos)
+    {
+        if (_count) {
+            size_type position = pos - begin();
+            size_type distance_end = end() - pos - 1;
+
+            _alloc.destroy(&_contents[position]);
+            for (size_type p=position; p < _count - 1; p++)
+            {
+                _contents[p] = std::move(_contents[p + 1]);
+            }
+            _count--;
+            return iterator(&_contents[position]);
+        }
+        else {
+            return iterator(nullptr);
+        }
+    }
+
+    iterator erase(const_iterator first, const_iterator last)
+    {
+        if (first == last) {
+            return iterator(first.n);
+        }
+
+        size_type position = first.n - _contents;
+        size_type count = last - first;
+
+        for (size_type p=position; p < count; p++) {
+            _alloc.destroy(&_contents[p]);
+        }
+
+        if (last < end()) {
+            size_type items_to_move = end() - last;
+            for (size_type p = position; p < _count - 1; p++) {
+                _contents[p] = std::move(_contents[p + count]);
+            }
+        }
+
+        _count -= count;
+
+        return iterator(&_contents[position]);
+    }
 
 //emplace is missing
 

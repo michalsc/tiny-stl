@@ -84,33 +84,45 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
     }
 
     SECTION("Operators and assigns") {
-        std::vector<int> nums1 {3, 1, 4, 6, 5, 9};
-        std::vector<int> nums2;
-        std::vector<int> nums3;
 
-        // Initially nums1 is set, others are empty
-        CHECK( (nums1.size() == 6 && nums2.size() == 0 && nums3.size() == 0) );
+        SECTION("operator=") {
+            std::vector<int> nums1 {3, 1, 4, 6, 5, 9};
+            std::vector<int> nums2;
+            std::vector<int> nums3;
 
-        nums2 = nums1;
+            // Initially nums1 is set, others are empty
+            CHECK( (nums1.size() == 6 && nums2.size() == 0 && nums3.size() == 0) );
 
-        // Copy operator created separate copy of nums1 in nums2. Both are equal size
-        CHECK( (nums1.size() == 6 && nums2.size() == 6 && nums3.size() == 0) );
+            nums2 = nums1;
 
-        nums3 = std::move(nums1);
+            // Copy operator created separate copy of nums1 in nums2. Both are equal size
+            CHECK( (nums1.size() == 6 && nums2.size() == 6 && nums3.size() == 0) );
 
-        // Move operator transferred nums1 into nums3, leaving nums1 empty
-        CHECK( (nums1.size() == 0 && nums2.size() == 6 && nums3.size() == 6) );
+            nums3 = std::move(nums1);
 
-        tinystd::vector<char> characters;
-        characters.assign(5, 'a');
-
-        CHECK( characters.size() == 5 );
-
-        for (int i=0; i < 5; i++) {
-            CHECK( characters[i] == 'a' );
+            // Move operator transferred nums1 into nums3, leaving nums1 empty
+            CHECK( (nums1.size() == 0 && nums2.size() == 6 && nums3.size() == 6) );
         }
 
-        CHECK( nums2 == nums3 );
+        SECTION("operator==") {
+            std::vector<int> nums1 {3, 1, 4, 6, 5, 9};
+            std::vector<int> nums2;
+
+            nums2 = nums1;
+
+            CHECK( nums2 == nums1 );
+        }
+
+        SECTION("assign") {
+            tinystd::vector<char> characters;
+            characters.assign(5, 'a');
+
+            CHECK( characters.size() == 5 );
+
+            for (int i=0; i < 5; i++) {
+                CHECK( characters[i] == 'a' );
+            }
+        }
     }
 
     SECTION("Element access") {
@@ -168,89 +180,129 @@ TEST_CASE("tinystl::vector class", "[tinystl::vector]") {
     }
 
     SECTION("Modifiers") {
-        tinystd::vector<int> vec(3,100);
-        
-        CHECK( vec.size() == 3 );
-        CHECK( (vec[0] == 100 && vec[1] == 100 && vec[2] == 100) );
-    
-        auto it = vec.begin();
-        it = vec.insert(it, 200);
-        
-        CHECK( vec.size() == 4 );
-        CHECK( vec[0] == 200 );
-        CHECK( (vec[1] == 100 && vec[2] == 100 && vec[3] == 100) );
+        SECTION("insert") {
+            tinystd::vector<int> vec(3,100);
 
-        vec.insert(it,2,300);
-        CHECK( vec.size() == 6);
-        CHECK( vec[0] == 300 );
-        CHECK( vec[1] == 300 );
-        CHECK( vec[2] == 200 );
+            CHECK( vec.size() == 3 );
+            CHECK( (vec[0] == 100 && vec[1] == 100 && vec[2] == 100) );
 
-        // "it" no longer valid, get a new one:
-        it = vec.begin();
-    
-        tinystd::vector<int> vec2(2,400);
-        vec.insert(it+2, vec2.begin(), vec2.end());
+            auto it = vec.begin();
+            it = vec.insert(it, 200);
 
-        CHECK( vec.size() == 8);
-        CHECK( vec[0] == 300 );
-        CHECK( vec[1] == 300 );
-        CHECK( vec[2] == 400 );
-        CHECK( vec[3] == 400 );
-        CHECK( vec[4] == 200 );
-        CHECK( vec[5] == 100 );
+            CHECK( vec.size() == 4 );
+            CHECK( vec[0] == 200 );
+            CHECK( (vec[1] == 100 && vec[2] == 100 && vec[3] == 100) );
 
-        int arr[] = { 501,502,503 };
-        int test_arr[] = { 501, 502, 503, 300, 300, 400, 400, 200, 100, 100, 100 };
-        vec.insert(vec.begin(), arr, arr+3);
+            vec.insert(it,2,300);
+            CHECK( vec.size() == 6);
+            CHECK( vec[0] == 300 );
+            CHECK( vec[1] == 300 );
+            CHECK( vec[2] == 200 );
 
-        CHECK( vec.size() == 11 );
-        for (int i=0; i < 11; i++) {
-            CHECK( vec[i] == test_arr[i] );
+            // "it" no longer valid, get a new one:
+            it = vec.begin();
+
+            tinystd::vector<int> vec2(2,400);
+            vec.insert(it+2, vec2.begin(), vec2.end());
+
+            CHECK( vec.size() == 8);
+            CHECK( vec[0] == 300 );
+            CHECK( vec[1] == 300 );
+            CHECK( vec[2] == 400 );
+            CHECK( vec[3] == 400 );
+            CHECK( vec[4] == 200 );
+            CHECK( vec[5] == 100 );
+
+            int arr[] = { 501,502,503 };
+            int test_arr[] = { 501, 502, 503, 300, 300, 400, 400, 200, 100, 100, 100 };
+            vec.insert(vec.begin(), arr, arr+3);
+
+            CHECK( vec.size() == 11 );
+            for (int i=0; i < 11; i++) {
+                CHECK( vec[i] == test_arr[i] );
+            }
         }
 
-        // Erase missing...
+        SECTION("erase") {
+            tinystd::vector<int> c{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            c.erase(c.begin());
 
-        tinystd::vector<tinystd::string> numbers;
- 
-        numbers.push_back("abc");
-        tinystd::string s = "def";
-        numbers.push_back(std::move(s));
+            CHECK( c.size() == 9 );
+            for (int i=0; i < 9; i++) {
+                CHECK( c[i] == i+1 );
+            }
 
-        CHECK( numbers.size() == 2 );
-        CHECK( numbers[0] == "abc" );
-        CHECK( numbers[1] == "def" );
-        CHECK( s == "" );
+            c.erase(c.begin()+2, c.begin()+5);
 
-        tinystd::vector<int> numbers1;
+            for (int i=0; i < c.size(); i++)
+                std::cout << c[i] << ",";
+            CHECK( c.size() == 6 );
 
-        numbers1.push_back(5);
-        numbers1.push_back(3);
-        numbers1.push_back(4);
-        numbers1.pop_back();
+            int test[] = {1, 2, 6, 7, 8, 9};
+            for (int i=0; i < 6; i++) {
+                CHECK( c[i] == test[i] );
+            }
 
-        CHECK( numbers1.size() == 2 );
-        CHECK( numbers1[0] == 5 );
-        CHECK( numbers1[1] == 3 );
+            // Erase all even numbers (C++11 and later)
+            for (auto it = c.begin(); it != c.end(); ) {
+                if (*it % 2 == 0) {
+                    it = c.erase(it);
+                } else {
+                    ++it;
+                }
+            }
 
-        tinystd::vector<int> c = {1, 2, 3};
-        CHECK( c.size() == 3 );
-        CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3) );
-        c.resize(5);
-        CHECK( c.size() == 5 );
-        CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3 && c[4] == 0 && c[5] == 0) );
-        c.resize(2);
-        CHECK( c.size() == 2 );
-        CHECK( (c[0] == 1 && c[1] == 2) );
+            int test2[] = {1, 7, 9};
+            CHECK( c.size() == 3 );
+            for (int i=0; i < 3; i++) {
+                CHECK( c[i] == test2[i] );
+            }
+        }
 
-        tinystd::vector<int> v1{1, 2, 3};
-        tinystd::vector<int> v2{7, 8, 9};
- 
-        v2.swap(v1);
+        SECTION("push_back/pop_back") {
+            tinystd::vector<tinystd::string> numbers;
 
-        CHECK( v1.size() == 3 );
-        CHECK( v2.size() == 3 );
-        CHECK( (v1[0] == 7 && v1[1] == 8 && v1[2] == 9) );
-        CHECK( (v2[0] == 1 && v2[1] == 2 && v2[2] == 3) );
+            numbers.push_back("abc");
+            tinystd::string s = "def";
+            numbers.push_back(std::move(s));
+
+            CHECK( numbers.size() == 2 );
+            CHECK( numbers[0] == "abc" );
+            CHECK( numbers[1] == "def" );
+            CHECK( s == "" );
+
+            tinystd::vector<int> numbers1;
+
+            numbers1.push_back(5);
+            numbers1.push_back(3);
+            numbers1.push_back(4);
+            numbers1.pop_back();
+
+            CHECK( numbers1.size() == 2 );
+            CHECK( numbers1[0] == 5 );
+            CHECK( numbers1[1] == 3 );
+
+            tinystd::vector<int> c = {1, 2, 3};
+            CHECK( c.size() == 3 );
+            CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3) );
+            c.resize(5);
+            CHECK( c.size() == 5 );
+            CHECK( (c[0] == 1 && c[1] == 2 && c[2] == 3 && c[4] == 0 && c[5] == 0) );
+            c.resize(2);
+            CHECK( c.size() == 2 );
+            CHECK( (c[0] == 1 && c[1] == 2) );
+        }
+
+        SECTION("swap") {
+            tinystd::vector<int> v1{1, 2, 3};
+            tinystd::vector<int> v2{7, 8, 9};
+
+            v2.swap(v1);
+
+            CHECK( v1.size() == 3 );
+            CHECK( v2.size() == 3 );
+            CHECK( (v1[0] == 7 && v1[1] == 8 && v1[2] == 9) );
+            CHECK( (v2[0] == 1 && v2[1] == 2 && v2[2] == 3) );
+        }
     }
 }
