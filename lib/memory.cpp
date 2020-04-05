@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <strings.h>
 #include <tinystl/bits/support.h>
 
 void * mungwall_malloc(size_t size)

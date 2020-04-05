@@ -7,6 +7,7 @@
     with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+#include <string.h>
 #include <tinystl/allocator>
 #include <tinystl/string>
 #include <tinystl/bits/support.h>
