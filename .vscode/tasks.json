@@ -1,100 +1,64 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "command": "sh",
-    "isShellCommand": true,
-    "args": ["-c"],
-    "showOutput": "always",
+    "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "Build",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
+            "type": "shell",
+            "label": "Build",
+            "group": "build",
+            "command": "make",
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+        },
+        {
+            "type": "shell",
+            "label": "Build library",
+            "group": "build",
+            "command": "make",
             "args": [
-                "make"
+                "tinystl"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/build"
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [ "relative", "${workspaceRoot}" ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-               }
-            }
-        },
-        {
-            "taskName": "Build library",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
-            "args": [
-                "make tinystl"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [ "relative", "${workspaceRoot}" ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-               }
-            }
-        },
-        {
-            "taskName": "Run test",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
-            "args": [
-                "make test"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [ "relative", "${workspaceRoot}" ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-               }
-            }
-        },
-        {
-            "taskName": "Run",
-            "suppressTaskName": true,
-            "isTestCommand": true,
-            "args": [
-                "./build/example/example"
+            "problemMatcher": [
+                "$gcc"
             ]
         },
         {
-            "taskName": "Configure",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
+            "type": "shell",
+            "label": "Run test",
+            "group": "test",
+            "command": "make",
+            "args": [
+                "test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Run",
+            "group": "test",
+            "command": "./build/example/example",
+        },
+        {
+            "type": "shell",
+            "label": "Configure",
+            "group": "none",
+            "command": "sh",
             "args": [
                 "mkdir build; cd build; cmake .."
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
-
         }
     ]
 }
