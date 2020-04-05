@@ -502,10 +502,10 @@ public:
                 _list.listHead.succ->pred = n;
                 _list.listHead.succ = n;
             } else {
-                while (no && no->value < n->value) no = no->getSucc();
+                while (no && !(n->value < n->value)) no = no->getSucc();
                 if (no) {
-                    n->pred = no;
-                    n->succ = no->succ;
+                    n->succ = no;
+                    n->pred = no->pred;
                     n->pred->succ = n;
                     n->succ->pred = n;
                 } else _list.addTail(n);
@@ -514,6 +514,31 @@ public:
         }
         x.count = 0;
     }
+    template <class Compare>
+    void merge(list& x, Compare comp) {
+        node<value_type> *n;
+        while ((n = x._list.remHead()) != nullptr) {
+            node<value_type> *no = _list.getHead();
+            if (comp(n->value, no->value)) {
+                n->pred = &_list.listHead;
+                n->succ = _list.listHead.succ;
+
+                _list.listHead.succ->pred = n;
+                _list.listHead.succ = n;
+            } else {
+                while (no && !comp(n->value, no->value)) no = no->getSucc();
+                if (no) {
+                    n->succ = no;
+                    n->pred = no->pred;
+                    n->pred->succ = n;
+                    n->succ->pred = n;
+                } else _list.addTail(n);
+            }
+            count++;
+        }
+        x.count = 0;
+    }
+
     void sort() {
         node<value_type> *n;
         minlist<value_type> l;
@@ -531,8 +556,8 @@ public:
                 } else {
                     while (no && no->value < n->value) no = no->getSucc();
                     if (no) {
-                        n->pred = no;
-                        n->succ = no->succ;
+                        n->succ = no;
+                        n->pred = no->pred;
                         n->pred->succ = n;
                         n->succ->pred = n;
                     } else l.addTail(n);
@@ -559,8 +584,8 @@ public:
                 } else {
                     while (no && comp(no->value, n->value)) no = no->getSucc();
                     if (no) {
-                        n->pred = no;
-                        n->succ = no->succ;
+                        n->succ = no;
+                        n->pred = no->pred;
                         n->pred->succ = n;
                         n->succ->pred = n;
                     } else l.addTail(n);

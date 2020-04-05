@@ -299,7 +299,7 @@ TEST_CASE("tinystl::list class", "[tinystl::list]") {
 
             second.push_back (2.1);
 
-            //first.merge(second, mycomparison);
+            first.merge(second, mycomparison);
 
             double test_list[] = { 1.4, 2.2, 2.9, 2.1, 3.1, 3.7, 7.1 };
             int i=0;
