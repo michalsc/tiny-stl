@@ -790,8 +790,8 @@ private:
 
 
 template< class T, class Alloc >
-bool operator==( const std::vector<T,Alloc>& lhs,
-                 const std::vector<T,Alloc>& rhs )
+bool operator==( const tinystd::vector<T,Alloc>& lhs,
+                 const tinystd::vector<T,Alloc>& rhs )
 {
     if (lhs.size() != rhs.size()) {
         return false;
@@ -807,8 +807,8 @@ bool operator==( const std::vector<T,Alloc>& lhs,
 }
 
 template< class T, class Alloc >
-bool operator!=( const std::vector<T,Alloc>& lhs,
-                 const std::vector<T,Alloc>& rhs )
+bool operator!=( const tinystd::vector<T,Alloc>& lhs,
+                 const tinystd::vector<T,Alloc>& rhs )
 {
     if (lhs.size() != rhs.size()) {
         return true;
