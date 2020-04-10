@@ -33,10 +33,6 @@ public:
     typedef uintptr_t               size_type;
     typedef ptrdiff_t               difference_type;
 
-private:
-    const size_type _initialGrowthAdd = 4;
-
-public:
     // Interators
     class const_iterator;
     // Bidirectional iterator for list
@@ -244,9 +240,9 @@ public:
 
     // Constructors
     explicit vector(const allocator_type& alloc = allocator_type())
-        : _contents(nullptr), _count(0), _capacity(0), _growthAdd(_initialGrowthAdd), _alloc(alloc) { }
+        : _contents(nullptr), _count(0), _capacity(0), _alloc(alloc) { }
     vector(size_type count, const value_type& value, const allocator_type& alloc = allocator_type())
-        : _count(count), _capacity(count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
+        : _count(count), _capacity(count), _alloc(alloc)
     {
         _contents = _alloc.allocate(count);
         for (int i=0; i < count; i++) {
@@ -254,13 +250,13 @@ public:
         }
     }
     explicit vector(size_type count, const allocator_type& alloc = allocator_type())
-        : _count(count), _capacity(count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
+        : _count(count), _capacity(count), _alloc(alloc)
     {
         _contents = _alloc.allocate(count);
     }
     template< typename InputIt,
               typename = std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
-    vector( InputIt first, InputIt last, const allocator_type& alloc = allocator_type() ) : _alloc(alloc), _growthAdd(_initialGrowthAdd)
+    vector( InputIt first, InputIt last, const allocator_type& alloc = allocator_type() ) : _alloc(alloc)
     {
         _count = std::distance(first, last);
         _capacity = _count;
@@ -271,7 +267,7 @@ public:
         }
     }
     vector(const vector& other)
-        : _count(other._count), _capacity(other._count), _growthAdd(_initialGrowthAdd), _alloc(other.get_allocator())
+        : _count(other._count), _capacity(other._count), _alloc(other.get_allocator())
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -281,7 +277,7 @@ public:
         }
     }
     vector(const vector& other, const allocator_type & alloc)
-        : _count(other._count), _capacity(other._count), _growthAdd(_initialGrowthAdd), _alloc(alloc)
+        : _count(other._count), _capacity(other._count), _alloc(alloc)
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -291,7 +287,7 @@ public:
         }
     }
     vector(vector&& other)
-        : _count(other._count), _capacity(other._count), _growthAdd(other._growthAdd), _alloc(other.get_allocator())
+        : _count(other._count), _capacity(other._count), _alloc(other.get_allocator())
     {
         if (_count > 0) {
             _contents = other._contents;
@@ -299,10 +295,9 @@ public:
         other._contents = nullptr;
         other._capacity = 0;
         other._size = 0;
-        other._growthAdd = _initialGrowthAdd;
     }
     vector(vector&& other, const allocator_type& alloc)
-        : _count(other._count), _capacity(other._capacity), _growthAdd(other._growthAdd), _alloc(alloc)
+        : _count(other._count), _capacity(other._capacity), _alloc(alloc)
     {
         if (_alloc == other._alloc) {
             if (_count > 0) {
@@ -311,7 +306,6 @@ public:
             other._contents = nullptr;
             other._capacity = 0;
             other._size = 0;
-            other._growthAdd = _initialGrowthAdd;
         }
         else {
             if (_count > 0) {
@@ -323,7 +317,7 @@ public:
         }
     }
     vector(std::initializer_list<value_type> init, const allocator_type& alloc = allocator_type())
-        : _count(init.size()), _capacity(init.size()), _growthAdd(_initialGrowthAdd), _alloc(alloc)
+        : _count(init.size()), _capacity(init.size()), _alloc(alloc)
     {
         if (_count > 0) {
             _contents = _alloc.allocate(_count);
@@ -389,16 +383,13 @@ public:
             _contents = other._contents;
             _capacity = other._capacity;
             _count = other._count;
-            _growthAdd = other._growthAdd;
             other._contents = nullptr;
             other._capacity = 0;
             other._size = 0;
-            other._growthAdd = _initialGrowthAdd;
         }
         else {
             _capacity = other._count;
             _count = other._count;
-            _growthAdd = _initialGrowthAdd;
             _contents = _alloc.allocate(_capacity);
 
             pointer p = _contents;
@@ -446,7 +437,6 @@ public:
         for (int i=0; i < count; i++) {
             _alloc.construct(&_contents[i], value);
         }
-        _growthAdd = _initialGrowthAdd;
         _count = count;
     }
     template < class InputIt,
@@ -540,13 +530,15 @@ public:
     void shrink_to_fit() {}
     void reserve(size_type required)
     {
+        if (required < 4) {
+            required = 4;
+        }
         if (required > _capacity) {
             if (required > max_size()) {
                 throw std::length_error("tinystd::vector::reserve() too large!");
             }
-            if (required / _growthAdd < max_size()) {
-                required = ((required * _growthAdd++) / _initialGrowthAdd + 15) & ~15;
-            }
+            size_type mask = (~size_type(0)) >> __builtin_clzl(required);
+            required = (required + mask) & ~mask;
             pointer new_buffer = _alloc.allocate(required);
             if (new_buffer) {
                 if (_contents != nullptr) {
@@ -581,9 +573,6 @@ public:
         tmp1 = _capacity;
         _capacity = other._capacity;
         other._capacity = tmp1;
-        tmp1 = _growthAdd;
-        _growthAdd = other._growthAdd;
-        other._growthAdd = tmp1;
     }
 
     void emplace_back(value_type&& value)
@@ -784,7 +773,6 @@ private:
     pointer         _contents;
     size_type       _count;
     size_type       _capacity;
-    size_type       _growthAdd;
     allocator_type  _alloc;
 };
 
