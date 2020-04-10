@@ -50,8 +50,8 @@ public:
         iterator& operator-=(difference_type pos) { n -= pos; return *this; }
         iterator operator+(difference_type pos) { iterator tmp(*this); tmp+=pos; return tmp; }
         iterator operator-(difference_type pos) { iterator tmp(*this); tmp-=pos; return tmp; }
-        friend inline iterator operator+(const difference_type pos, const iterator& rhs) { iterator(tmp); tmp+=pos; return tmp; }
-        friend inline iterator operator-(const difference_type pos, const iterator& rhs) { iterator(tmp); tmp-=pos; return tmp; }
+        friend inline iterator operator+(const difference_type pos, const iterator& rhs) { iterator tmp(rhs); tmp+=pos; return tmp; }
+        friend inline iterator operator-(const difference_type pos, const iterator& rhs) { iterator tmp(rhs); tmp-=pos; return tmp; }
         friend inline difference_type operator-(const iterator& rhs, const iterator& lhs) { return lhs.n - rhs.n; }
         difference_type operator-(const iterator& rhs) { return n - rhs.n; }
         bool operator<(const iterator &rhs) { return rhs.n > n; }
@@ -101,8 +101,8 @@ public:
         const_iterator& operator-=(difference_type pos) { n -= pos; return *this; }
         const_iterator operator+(difference_type pos) { const_iterator tmp(*this); tmp+=pos; return tmp; }
         const_iterator operator-(difference_type pos) { const_iterator tmp(*this); tmp-=pos; return tmp; }
-        friend inline const_iterator operator+(const difference_type pos, const const_iterator& rhs) { const_iterator(tmp); tmp+=pos; return tmp; }
-        friend inline const_iterator operator-(const difference_type pos, const const_iterator& rhs) { const_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline const_iterator operator+(const difference_type pos, const const_iterator& rhs) { const_iterator tmp(rhs); tmp+=pos; return tmp; }
+        friend inline const_iterator operator-(const difference_type pos, const const_iterator& rhs) { const_iterator tmp(rhs); tmp-=pos; return tmp; }
         friend inline difference_type operator-(const const_iterator& rhs, const const_iterator& lhs) { return lhs.n - rhs.n; }
         difference_type operator-(const const_iterator& rhs) { return n - rhs.n; }
         bool operator<(const iterator &rhs) { return rhs.n > n; }
@@ -152,8 +152,8 @@ public:
         reverse_iterator& operator-=(difference_type pos) { n += pos; return *this; }
         reverse_iterator operator+(difference_type pos) { reverse_iterator tmp(*this); tmp+=pos; return tmp; }
         reverse_iterator operator-(difference_type pos) { reverse_iterator tmp(*this); tmp-=pos; return tmp; }
-        friend inline reverse_iterator operator+(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator(tmp); tmp+=pos; return tmp; }
-        friend inline reverse_iterator operator-(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline reverse_iterator operator+(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator tmp(rhs); tmp+=pos; return tmp; }
+        friend inline reverse_iterator operator-(const difference_type pos, const reverse_iterator& rhs) { reverse_iterator tmp(rhs); tmp-=pos; return tmp; }
         friend inline difference_type operator-(const reverse_iterator& rhs, const reverse_iterator& lhs) { return rhs.n - lhs.n; }
         difference_type operator-(const reverse_iterator& rhs) { return rhs.n - n; }
         bool operator<(const iterator &rhs) { return rhs.n < n; }
@@ -203,8 +203,8 @@ public:
         const_reverse_iterator& operator-=(difference_type pos) { n += pos; return *this; }
         const_reverse_iterator operator+(difference_type pos) { const_reverse_iterator tmp(*this); tmp+=pos; return tmp; }
         const_reverse_iterator operator-(difference_type pos) { const_reverse_iterator tmp(*this); tmp-=pos; return tmp; }
-        friend inline const_reverse_iterator operator+(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator(tmp); tmp+=pos; return tmp; }
-        friend inline const_reverse_iterator operator-(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator(tmp); tmp-=pos; return tmp; }
+        friend inline const_reverse_iterator operator+(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator tmp(rhs); tmp+=pos; return tmp; }
+        friend inline const_reverse_iterator operator-(const difference_type pos, const const_reverse_iterator& rhs) { const_reverse_iterator tmp(rhs); tmp-=pos; return tmp; }
         friend inline difference_type operator-(const const_reverse_iterator& rhs, const const_reverse_iterator& lhs) { return rhs.n - lhs.n; }
         difference_type operator-(const const_reverse_iterator& rhs) { return rhs.n - n; }
         bool operator<(const iterator &rhs) { return rhs.n < n; }
@@ -334,7 +334,7 @@ public:
     {
         if (_count > 0) {
             if (!std::is_pointer<value_type>::value) {
-                for (int i=0; i < _count; i++) {
+                for (size_type i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
             }
@@ -346,7 +346,7 @@ public:
     {
         if (_capacity) {
             if (!std::is_pointer<value_type>::value) {
-                for (int i=0; i < _count; i++) {
+                for (size_type i=0; i < _count; i++) {
                     _alloc.destroy(&_contents[i]);
                 }
             }
@@ -778,8 +778,8 @@ private:
 
 
 template< class T, class Alloc >
-bool operator==( const std::vector<T,Alloc>& lhs,
-                 const std::vector<T,Alloc>& rhs )
+bool operator==( const tinystd::vector<T,Alloc>& lhs,
+                 const tinystd::vector<T,Alloc>& rhs )
 {
     if (lhs.size() != rhs.size()) {
         return false;
@@ -795,8 +795,8 @@ bool operator==( const std::vector<T,Alloc>& lhs,
 }
 
 template< class T, class Alloc >
-bool operator!=( const std::vector<T,Alloc>& lhs,
-                 const std::vector<T,Alloc>& rhs )
+bool operator!=( const tinystd::vector<T,Alloc>& lhs,
+                 const tinystd::vector<T,Alloc>& rhs )
 {
     if (lhs.size() != rhs.size()) {
         return true;
