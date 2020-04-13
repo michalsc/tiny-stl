@@ -494,7 +494,11 @@ public:
     reference at(size_type pos)
     {
         if (pos >= _count) {
+#if NO_EXCEPTIONS
+            return *(pointer)nullptr;
+#else
             throw std::out_of_range("tinystd::vector::at() out of range");
+#endif
         }
         else {
             return _contents[pos];
@@ -503,7 +507,11 @@ public:
     const_reference at(size_type pos) const
     {
         if (pos >= _count) {
+#if NO_EXCEPTIONS
+            return *(pointer)nullptr;
+#else
             throw std::out_of_range("tinystd::vector::at() out of range");
+#endif
         }
         else {
             return _contents[pos];
@@ -541,9 +549,11 @@ public:
     void reserve(size_type required)
     {
         if (required > _capacity) {
+#if !NO_EXCEPTIONS
             if (required > max_size()) {
                 throw std::length_error("tinystd::vector::reserve() too large!");
             }
+#endif
             if (required / _growthAdd < max_size()) {
                 required = ((required * _growthAdd++) / _initialGrowthAdd + 15) & ~15;
             }

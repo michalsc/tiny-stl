@@ -11,6 +11,7 @@
 #ifndef _TINYSTD_STRING
 #define _TINYSTD_STRING
 
+#include <string.h>
 #include <iterator>
 #include <tinystl/allocator>
 #include <tinystl/bits/support.h>
