@@ -21,8 +21,10 @@
 
 void * mungwall_malloc(size_t size)
 {
+    size_t orig_size = size;
+    size = (size + 3) & ~3;
     uint32_t *ptr = reinterpret_cast<uint32_t *>(malloc(size + 32));
-    ptr[0] = size;
+    ptr[0] = orig_size;
     ptr[1] = 0xdeadbeef;
     ptr[2] = 0xdeadbeef;
     ptr[3] = 0xdeadbeef;
@@ -40,9 +42,10 @@ void * mungwall_malloc(size_t size)
 void mungwall_free(void *ptr, size_t size)
 {
     uint32_t *p = reinterpret_cast<uint32_t *>(ptr);
-
+    size_t orig_size = size;
+    size = (size + 3) & ~3;
     p -= 4;
-    if (*p != (unsigned int)size) {
+    if (*p != (unsigned int)orig_size) {
 #ifndef NDEBUG
         BUG("Size mismatch at mungwall_free!! %d != %d\n", *p, (uint32_t)size);
 #endif
