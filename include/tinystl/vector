@@ -737,7 +737,6 @@ public:
     {
         if (_count) {
             size_type position = pos - begin();
-            size_type distance_end = end() - pos - 1;
 
             _alloc.destroy(&_contents[position]);
             for (size_type p=position; p < _count - 1; p++)
