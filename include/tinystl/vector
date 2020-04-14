@@ -94,7 +94,7 @@ public:
         const_iterator() : n(nullptr){};
         const_iterator(pointer node) : n(node){};
         const_iterator(const const_iterator &it) : n(it.n){};
-        const_iterator(const typename vector<value_type>::iterator &it) : n(it.n) {};
+        const_iterator(const typename vector<value_type, Alloc>::iterator &it) : n(it.n) {};
         value_type &operator*() const { return *n; }
 
         const_iterator& operator+=(difference_type pos) { n += pos; return *this; }
@@ -196,7 +196,7 @@ public:
         const_reverse_iterator() : n(nullptr){};
         const_reverse_iterator(pointer node) : n(node){};
         const_reverse_iterator(const const_reverse_iterator &it) : n(it.n){};
-        const_reverse_iterator(const typename vector<value_type>::const_iterator &it) : n(it.n) {};
+        const_reverse_iterator(const typename vector<value_type, Alloc>::const_iterator &it) : n(it.n) {};
         value_type &operator*() const { return *n; }
 
         const_reverse_iterator& operator+=(difference_type pos) { n -= pos; return *this; }
